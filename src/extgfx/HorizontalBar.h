@@ -6,9 +6,8 @@
 #include "TextPainter.h"
 
 
-/*
+/**
 Draws a bar with text.
-- 'value' means length of the bar; should be 0-100 (as per cent)
 
 Colors:
 - colorBar - color of bar
@@ -37,12 +36,18 @@ else it is printer after bar:
 
 	and colors are used:
 	- colorTextOnBg - text color
-	- bgColor /--colorBgOnBg--/ - background box under the text
+	- bgColor - background box under the text
 
 */
 
+/* maximální délka textu, delší bude ořezán */
 #define HB_MAX_TEXT_SIZE 100
 
+
+/**
+ * Barevný profil - sada barev pro jednotlivé zobrazované hodnoty. 
+ * Předává se do HorizontalBar.setColors() jako pole pointerů na HbColorProfile.
+ */
 class HbColorProfile {
     public:
         HbColorProfile( float valueFrom, uint16_t colorBar, uint16_t colorBorder, 
@@ -54,6 +59,7 @@ class HbColorProfile {
 
         /** color of bar  */
         uint16_t colorBar;
+
         /** color of border  */
         uint16_t colorBorder;
 
@@ -71,38 +77,68 @@ class HbColorProfile {
 };
 
 
+/**
+ * Kreslí horizontální bar gauge.
+ 
+ If bar is longer than text, text is centered in bar:
+
+    +---border--------------------------------+
+    |###########################              |
+    |######## 60 % #############              |
+    |###########################              |
+    +---border--------------------------------+
+
+else it is printer after bar:
+
+    +---border--------------------------------+
+    |########                                 |
+    |######## 17526 W                         |
+    |########                                 |
+    +---border--------------------------------+
+
+ */
 class HorizontalBar {
     public:
         HorizontalBar( Adafruit_GFX *display, TextPainter * painter );
+        /** Font pro text. */
         void setFont( TpFontConfig * font );
+        /** Rozsah hodnot, které budou použity pro zobrazení od levé do pravé strany. Min musí být menší než max.*/
         void setRange(float minVal, float maxVal);
+        /** Pozice a velikost widgetu. */
         void setPosition( int x, int y, int w, int h );
+
+        /** Nastaví aktuální hodnotu a aktuální text. 
+         * Hodnota může být mimo rozsah minVal..maxVal; v takovém případě se zobrazí jako minimum/maximum. */
         void setValue( float val, char * text );
 
         /** pole barevných konfigurací pro rozsahy hodnot; musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně */
         void setColors( HbColorProfile **colors );
+
+        /** Vykresli. Pokud se data nezměnila, nekreslí se, pokud není force=true. */
         void draw( bool force = false );
 
+        /** Nastaví prvek k překreslení při příštím draw(), i když se nezměnily data. */
         void setDirty();
 
     private:
         Adafruit_GFX *display;
         TextPainter * painter;
         HbColorProfile **colors;
+        TpFontConfig * font;
         float minVal;
         float maxVal;
-        /** vzdalenost mezi minVal a maxVal */
-        float range;
         int x; 
         int y; 
         int h; 
         int w;
-        /** jiz znormalizovane = s jistotou mezi minVal a maxVal */
+
         float currentvalue;
         char currentText[HB_MAX_TEXT_SIZE+2];
-        bool dirty;
-        TpFontConfig * font;
 
+        bool dirty;
+
+        /** vzdalenost mezi minVal a maxVal */
+        float range;
 };
 
 
