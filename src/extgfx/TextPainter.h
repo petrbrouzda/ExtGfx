@@ -1,11 +1,23 @@
 #ifndef _TEXTPAINTER___H_
 #define _TEXTPAINTER___H_
 
+/**
+ * Nástroj pro zobrazení českého textu. 
+ * 
+ * Umí tisknout textové bloky včetně skoro korektního rozdělování českých slov na konci řádku.
+ * Umí tisknout jednořádkové texty ("labely") zarovnané vpravo/na střed/vlevo, s pozadím i bez.
+ * 
+ * Pracuje s češtinou v UTF-8, kterou mapuje na 8bit fonty dle https://github.com/petrbrouzda/fontconvert8-iso8859-2
+ * 
+ * Tiskne na jakékoli zařízení implementující Adafruit_GFX rozhraní (LCD displeje, ePaper displeje) nebo do canvasu, 
+ * podle toho, co dostane jako parametr.
+ */
+
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include "../gfxlatin2/gfxlatin2.h"
 
-/** velikost pracovního buffer, delší text bude oříznut na tuto délku */
+/** velikost pracovního bufferu, delší text bude oříznut na tuto délku */
 #define BUFFER_SIZE 512
 
 /** maximální délka slova, delší se vždy zalomí */
@@ -15,8 +27,7 @@
 #define MAX_DELKA_SLOVA_CO_SE_NEZALAMUJE 4
 
 
-// zakladni barvy
-
+// zakladni barvy - Adafruit_GFX pracuje s 16bit barvami 5-6-5
 #define	TP_BLACK   0x0000
 #define	TP_BLUE    0x001F
 #define	TP_RED     0xF800
@@ -27,18 +38,43 @@
 #define TP_WHITE   0xFFFF
 
 
+/** Objekt držící konfiguraci typu písma a nastavení řádkování. */
 class TpFontConfig {
     public:
-        TpFontConfig( const GFXfont * font, int lineHeightOffset = 0, int charWidthOffset = 0, int firstLineHeightOffset = 0 );
+        /**
+         * lineHeightOffset = změna velikosti řádkování vůči rámečku největšího znaku (0 = beze změny)
+         * charWidthOffset = změna šířky znaku proti šířce mezery (0 = beze změny)
+         * firstLineHeightOffset = offset první řádky vůči lineHeightOffset (0 = beze změny)
+         */
+        TpFontConfig( const GFXfont * font = NULL, int lineHeightOffset = 0, int charWidthOffset = 0, int firstLineHeightOffset = 0 );
 
         const GFXfont * font;
-        int lineHeightOffset;
+
+        /** zatím se nepoužívá, pro info: vzdálenost od účaří k hornímu okraji  */
+        int baselineOffset;
+
+        /** zatím se nepoužívá, pro info: délka ocásku dole pod účařím */
+        int underBaseline;
+
+        /** výška řádku */
+        int lineHeight;
+
+        /** změna šířky znaku proti šířce mezery (0 = beze změny) */
         int charWidthOffset;
+
+        /** offset první řádky vůči lineHeightOffset (0 = beze změny)  */
         int firstLineHeightOffset;
 };
 
-#define FP_MAX_SIZE -1
+#define TP_MAX_SIZE -1
 
+
+/**
+ * Nástroj pro tisk českého textu. 
+ * Umí tisknout textové bloky včetně skoro korektního rozdělování českých slov na konci řádku.
+ * Umí tisknout jednořádkové texty ("labely") zarovnané vpravo/na střed/vlevo.
+ * Tiskne na displej nebo do canvasu, podle toho, co dostane.
+ */
 class TextPainter {
 
     public:
@@ -48,13 +84,34 @@ class TextPainter {
          */
         TextPainter( Adafruit_GFX* display, bool hyphenation = true, bool convertUtf8to8bit = true );
 
+        /**
+         * Změna cíle, kam se tiskne. Může se tisknout i do canvasu, ne jen na fyzický displej.
+         */
+        void setDisplay( Adafruit_GFX* display );
 
-        /* nastaví použitý font a řádkování */
+        /**
+         * Vytvoří parametry fontu. Načte jeho velikost vyrenderováním základních písmen.
+         */
+        void createFontConfig( TpFontConfig * target, const GFXfont * font );
+
+
+        /* 
+        Nastaví použitý font a řádkování.
+        Pokud se následně změní odkazovaný objekt fontConfigu, NEMÁ to vliv na nastavení TextPainteru, protože
+        potřebná data si vyčte v okamžiku volání funkce setFont().
+         */
         void setFont( TpFontConfig * fontConfig );
 
 
+        /** 
+         * Vrátí konfiguraci fontu - odkaz na existující objekt, ne kopii. 
+         * Používá se pro dočasné odložení konfigurace, aby pak šla bezbolestně vrátit zpět.
+         */
+        TpFontConfig * getFont();
+
+
         /** Tisk textového pole: nastaví pozici levého horního rohu pole a velikost pole */
-        void startText( int x, int y, int width = FP_MAX_SIZE, int height = FP_MAX_SIZE );
+        void startText( int x, int y, int width = TP_MAX_SIZE, int height = TP_MAX_SIZE );
 
         /**
 		 * Tisk textového pole: 
@@ -66,9 +123,10 @@ class TextPainter {
 		 * je potreba pouzit zpracovani fontu dle https://github.com/petrbrouzda/fontconvert8-iso8859-2 !!!
 		 * 
 		 * Prvni radek se tiskne od pozice [X+x_offset, Y], ktera je LEVY HORNI roh prvniho pismene. 
+         * (To je odlišnost proti Adafruit GFX!!!)
 		 * x_offset se pouzije jen pro prvni radek, dalsi radek se tiskne na [X, Y+vyskaRadku] 
 		 * 
-		 * Zalamovani radek je omezene nastavenym bounding boxem - pri zavolani setPos(x,y) se 
+		 * Zalamovani radek je omezene nastavenym bounding boxem - pri zavolani startText(x,y) se 
 		 * nastavi bounding box.
 		 * 
 		 * Vraci aktualni pozici X, kterou je mozne pouzit jako x_offset pro dalsi volani (tj. ne absolutní
@@ -103,7 +161,8 @@ class TextPainter {
         /** Možná zarovnání pro printLabel() */
         enum HorizontalAlign { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT };
 
-        /** Vytiskne jednořádkový text. Y je horní okraj textu. 
+        /** 
+         * Vytiskne jednořádkový text. Y je horní okraj textu. 
          * 
          * Zarovnání vlevo = X je levá hrana textu.
          * Zarovnání doprostřed = X je střed textu.
@@ -113,13 +172,26 @@ class TextPainter {
         */
         void printLabel( TextPainter::HorizontalAlign ha, int x, int y, char * text );
 
+        /**
+         * Pod text se vytiskne obdélník v barvě pozadí.
+         * Platí jen pro printLabel.
+         */
+        void fillBackground( int color, int borderSize=1 );
+
+        /**
+         * Pod text se nebude tisknout obdélník v barvě pozadí.
+         * Platí jen pro printLabel.
+         */
+        void noBackground();
 
 
     private:
         Adafruit_GFX* display;
 
         /** rozdělování slov na konci řádku */
-        bool hyphenation; 
+        bool hyphenation;
+
+        /** konverze češtiny UTF8 -> 8bit */ 
         bool convertUtf8to8bit;
 
         /** sirka mezery, nastavi se automaticky z fontu, ale je mozne zmenit */
@@ -133,10 +205,11 @@ class TextPainter {
         
         /** pozice kurzoru */
         int posX;
+
         /** pozice kurzoru */
         int posY;
 
-        /** zacatek tiskoveho boxu */
+        /** pro tisk textu: zacatek textového boxu */
         int textBoxY;
 
         /** pro tisk textu: sirka obdelniku, do ktereho se smi vypsat text */
@@ -145,9 +218,17 @@ class TextPainter {
         /** pro tisk textu: vyska obdelniku, do ktereho se smi vypsat text */
         int textMaxY;
 
+        /** Aktuální font */
         TpFontConfig * fontConfig;
 
-        // ++++ parser textu
+        /** má se tisknout background? */
+        bool background;
+        /** barva pozadí */
+        int bgColor;
+        /** přesah pozadí proti textu */
+        int bgBorderSize;
+
+        // ++++ položky pro parser textu
         bool jeSamohlaska( char c );
         char samohlasky[60];
         char * curPos;

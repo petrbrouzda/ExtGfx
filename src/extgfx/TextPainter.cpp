@@ -7,10 +7,12 @@
 
 TpFontConfig::TpFontConfig(const GFXfont *font, int lineHeightOffset, int charWidthOffset, int firstLineHeightOffset)
 {
-    this->font = font;
-    this->lineHeightOffset = lineHeightOffset;
-    this->charWidthOffset = charWidthOffset;
-    this->firstLineHeightOffset = firstLineHeightOffset;
+    if( font!=NULL ) {
+        this->font = font;
+        this->charWidthOffset = charWidthOffset;
+        this->firstLineHeightOffset = firstLineHeightOffset;
+        this->lineHeight = font->yAdvance + lineHeightOffset;
+    }
 }
 
 TextPainter::TextPainter(Adafruit_GFX *display, bool hyphenation, bool convertUtf8to8bit)
@@ -19,14 +21,63 @@ TextPainter::TextPainter(Adafruit_GFX *display, bool hyphenation, bool convertUt
     this->hyphenation = hyphenation;
     this->convertUtf8to8bit = convertUtf8to8bit;
 
+    this->background = false;
+
     strcpy(this->samohlasky, (char*)"eyuioaEYUIOAěýáíéúůĚÝÁÍÉÚŮ");
     if( convertUtf8to8bit ) {
         utf8tocp( samohlasky );
     }
 }
 
+void TextPainter::setDisplay(Adafruit_GFX *display)
+{
+    this->display = display;
+}
+
+void TextPainter::createFontConfig( TpFontConfig *target, const GFXfont *font )
+{
+    int16_t x1, y1;
+    uint16_t w, h;
+
+    this->display->setFont( font );
+
+    char buffer[] = "MAjg096";
+    this->display->getTextBounds( (const char*)buffer, 0, 0, &x1, &y1, &w, &h );
+
+    /* vrácené hodnoty jsou:
+    x1 = nejvíc doleva, co znak sahá; pokud je před určeným bodem, má zápornou hodnotu
+    y1 = nejvyšší horní bod, co znak sahá, proti účaří
+    h = celková výška textu
+    
+    třeba: [-4,-29], w=83, h=40
+
+    h+y1 je přesah pod účaří
+    -y1 + 1 je první řádka
+    h by mělo být řádkování
+
+    */
+
+   target->font = font;
+   target->lineHeight = h + 2;
+   target->firstLineHeightOffset = - (h + y1 - 1);
+   target->baselineOffset = -y1;
+   target->underBaseline = h+y1;
+
+   target->charWidthOffset = 0;
+
+    #ifdef DUMP_DEBUG_INFO  
+        Serial.printf( "createFontConfig: [%d,%d], w=%d, h=%d, font yAdv=%d\n", x1, y1, w, h, font->yAdvance );
+        Serial.printf( "createFontConfig out: flho=%d lho=%d \n", target->firstLineHeightOffset, target->lineHeightOffset );
+    #endif
+}
+
 bool TextPainter::jeSamohlaska( char c ) {
   return strchr(this->samohlasky,c)!=NULL;
+}
+
+TpFontConfig *TextPainter::getFont()
+{
+    return this->fontConfig;
 }
 
 void TextPainter::startText(int x, int y, int width, int height)
@@ -35,13 +86,13 @@ void TextPainter::startText(int x, int y, int width, int height)
     this->textBoxY = y;
     this->posY = y + this->vyskaPrvnihoRadku;
 
-    if( width==FP_MAX_SIZE 
+    if( width==TP_MAX_SIZE 
         || width > this->display->width() - this->posX - 1 ) {
         this->boundingBoxWidth = this->display->width() - this->posX - 1;    
     } else {
         this->boundingBoxWidth = width;
     }
-    if( height==FP_MAX_SIZE 
+    if( height==TP_MAX_SIZE 
         || height > this->display->height() - this->textBoxY - 1 ) {
         this->textMaxY = this->display->height() - this->textBoxY - 1;
     } else {
@@ -59,12 +110,15 @@ void TextPainter::textLf(int offset)
     this->posY += this->vyskaRadku + offset;
 }
 
+/**
+ * Nastaví font k použití.
+ */
 void TextPainter::setFont(TpFontConfig *fontConfig)
 {
     this->fontConfig = fontConfig;
 
     this->display->setFont( fontConfig->font );
-    this->vyskaRadku = fontConfig->font->yAdvance + fontConfig->lineHeightOffset;
+    this->vyskaRadku = fontConfig->lineHeight;
     this->vyskaPrvnihoRadku = this->vyskaRadku + fontConfig->firstLineHeightOffset;
 
     // predpoklada, ze mezera je prvni znak
@@ -97,19 +151,56 @@ void TextPainter::printLabel( TextPainter::HorizontalAlign ha, int x, int y, cha
     if( this->convertUtf8to8bit ) {
         utf8tocp( buffer );
     }  
-    this->display->getTextBounds( (const char*)buffer, 0, this->vyskaRadku, &x1, &y1, &w, &h );
+    this->display->getTextBounds( (const char*)buffer, 0, 0, &x1, &y1, &w, &h );
 
-    int x0;
+    /* vrácené hodnoty jsou:
+    x1 = nejvíc doleva, co znak sahá; pokud je před určeným bodem, má zápornou hodnotu
+    y1 = nejvyšší horní bod, co znak sahá, proti účaří
+    h = celková výška textu
+    
+    třeba: [-4,-29], w=83, h=40
+
+    h+y1 je přesah pod účaří
+    */
+
+    int x0t, x0b;
     if( ha == ALIGN_CENTER ) {
-        x0 = x - (w/2);
+        x0b = x - (w/2);
+        x0t = x0b - x1;
     } else if( ha == ALIGN_RIGHT ) {
-        x0 = x - w - 1;
+        x0b = x - w - 1;
+        x0t = x0b - x1;
     } else { // left
-        x0 = x;
+        x0b = x;
+        x0t = x0b - x1;
     }
 
-    this->display->setCursor( x0, y + this->vyskaPrvnihoRadku );     
+    if( this->background ) {
+        #ifdef DUMP_DEBUG_INFO  
+            Serial.printf( "printLabel bg: [%d,%d], w=%d, h=%d, cfg=%d/%d \n", x1, y1, w, h, this->vyskaPrvnihoRadku, this->vyskaRadku );
+        #endif
+
+        // this->vyskaPrvnihoRadku je vzdálenost k účaří; h+y1 je přesah pod účaří
+        int vyska = this->vyskaPrvnihoRadku + (h+y1);  
+        this->display->fillRect( x0b - this->bgBorderSize , y - this->bgBorderSize + 1, 
+                        w + this->bgBorderSize + this->bgBorderSize, vyska + this->bgBorderSize + this->bgBorderSize, 
+                        this->bgColor );
+    }
+
+    this->display->setCursor( x0t, y + this->vyskaPrvnihoRadku );     
     this->display->print( buffer );
+}
+
+void TextPainter::fillBackground(int color, int borderSize )
+{
+    this->background = true;
+    this->bgColor = color;
+    this->bgBorderSize = borderSize;
+}
+
+void TextPainter::noBackground()
+{
+    this->background = false;
 }
 
 void TextPainter::setHyphenation(bool hyphenation)
@@ -179,6 +270,9 @@ boolean TextPainter::getNextWord() {
     return true;
 }
 
+/**
+ * Tisk textového bloku
+ */
 int TextPainter::printText( const char * text, int x_offset  ) {
 
     char buffer[BUFFER_SIZE];
