@@ -8,6 +8,10 @@
 
 #include "src/extgfx/TextPainter.h"
 #include "src/extgfx/HorizontalBar.h"
+#include "src/extgfx/SmallChart.h"
+#include "src/extgfx/BasicColors.h"
+
+#include <math.h>
 
 // parametry pripojeni displeje
 
@@ -53,8 +57,8 @@ void setup() {
     tft->init(240, 320);
     tft->invertDisplay(false);
     tft->setRotation(0);
-    tft->fillScreen(TP_BLACK);
-    tft->setTextColor(TP_WHITE);
+    tft->fillScreen(EG_BLACK);
+    tft->setTextColor(EG_WHITE);
   // ----- nastaveni displeje
 
   painter = new TextPainter( tft );
@@ -78,21 +82,21 @@ void demo1_zakladniTextovyBlok()
   int h = 115;
 
   // uděláme kolem něj fialový rámeček
-  tft->drawRect( x-1, y-1, w+2, h+2, TP_MAGENTA );
+  tft->drawRect( x-1, y-1, w+2, h+2, EG_MAGENTA );
 
   painter->setFont( &malePismo );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 5, (char*)"Blok textu s rozdělováním slov");
   
   // začneme textový blok a zapíšeme do něj
   painter->startText( x, y, w, h );
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   int offset = painter->printText( (char*)"Text s češtinou, který by se měl zalamovat na konci řádku a je ve fialovém rámečku.");
-  tft->setTextColor(TP_YELLOW);
+  tft->setTextColor(EG_YELLOW);
   // použijeme offset vrácený z předešlého printText() jako druhý parametr a budeme pokračovat na stejné řádce dál
   painter->printText( (char*)" A za něj přidáme žlutý text.", offset );
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   // odřádkování
   painter->textLf();
   offset = painter->printText( (char*)"Nová řádka." );
@@ -108,16 +112,16 @@ void demo1_zakladniTextovyBlok()
   h = 52;
 
   // uděláme kolem něj fialový rámeček
-  tft->drawRect( x-1, y-1, w+2, h+2, TP_MAGENTA );
+  tft->drawRect( x-1, y-1, w+2, h+2, EG_MAGENTA );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 160, (char*)"Blok textu bez rozdělování");
 
   // vypneme rozdělování slov
   painter->setHyphenation( false );
 
   painter->startText( x, y, w, h );
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   offset = painter->printText( (char*)"Text s češtinou, který by se měl zalamovat na konci řádku a je ve fialovém rámečku.");
 
   // zase ho zapneme
@@ -131,16 +135,16 @@ void demo2_labely()
 
   // --- zarovnání labelů
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 5, (char*)"Labely (jednořádkový text)");
 
 #define Y_START_DEMO2 30
 
-  tft->drawFastVLine( 4, Y_START_DEMO2, 55, TP_YELLOW );
-  tft->drawFastVLine( 236, Y_START_DEMO2, 55, TP_YELLOW );
-  tft->drawFastVLine( 120, Y_START_DEMO2, 55, TP_YELLOW );
+  tft->drawFastVLine( 4, Y_START_DEMO2, 55, EG_YELLOW );
+  tft->drawFastVLine( 236, Y_START_DEMO2, 55, EG_YELLOW );
+  tft->drawFastVLine( 120, Y_START_DEMO2, 55, EG_YELLOW );
 
-  tft->setTextColor(TP_RED);
+  tft->setTextColor(EG_RED);
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, Y_START_DEMO2, (char*)"Zarovnané vlevo");
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, Y_START_DEMO2+18, (char*)"Zarovnané na střed");
   painter->printLabel( TextPainter::ALIGN_RIGHT, 235, Y_START_DEMO2+18+18, (char*)"Zarovnané vpravo");
@@ -151,10 +155,10 @@ void demo2_labely()
 
 #define Y_START_DEMO2B Y_START_DEMO2+60
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, Y_START_DEMO2B+5, (char*)"Vyplněné pozadí");
 
-  tft->setTextColor(TP_RED);
+  tft->setTextColor(EG_RED);
 
   /* 
   Zde si budeme nastavovat větší písmo. Abychom nerozbili konfiguraci zbytku aplikace 
@@ -165,7 +169,7 @@ void demo2_labely()
   painter->setFont( &vetsiPismo );
 
   // zapneme pozadí
-  painter->fillBackground( TP_WHITE );
+  painter->fillBackground( EG_WHITE );
 
   // tři různě vysoké texty vedle sebe, aby bylo vidět, jak ten obdélník s pozadím vypadá
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, Y_START_DEMO2B+25, (char*)"ahoj");
@@ -173,7 +177,7 @@ void demo2_labely()
   painter->printLabel( TextPainter::ALIGN_RIGHT, 235, Y_START_DEMO2B+25, (char*)"VPRAVO");
 
   // zapneme pozadí s borderem
-  painter->fillBackground( TP_WHITE, 6 );
+  painter->fillBackground( EG_WHITE, 6 );
 
   // tři různě vysoké texty vedle sebe, aby bylo vidět, jak ten obdélník s pozadím vypadá
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, Y_START_DEMO2B+55, (char*)"ahoj");
@@ -188,7 +192,7 @@ void demo2_labely()
   painter->setFont( puvodniFont );
 
   // vytiskneme text původním malým písmem
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, Y_START_DEMO2B+100, (char*)"Vrácena původní velikost písma");
 
 }
@@ -207,14 +211,14 @@ void demo3_zmenaRadkovani()
   int h = 90;
 
   // uděláme kolem něj fialový rámeček
-  tft->drawRect( x-1, y-1, w+2, h+2, TP_MAGENTA );
+  tft->drawRect( x-1, y-1, w+2, h+2, EG_MAGENTA );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 5, (char*)"Defaultní řádkování");
   
   // začneme textový blok a zapíšeme do něj
   painter->startText( x, y, w, h );
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   painter->printText( (char*)"Ó, náhlý déšť teď zvířil prach a čilá laň s houfcem gazel běží k úkrytům. Loď čeří kýlem tůň obzvlášť v Grónské úžině.");
 
   
@@ -228,13 +232,13 @@ void demo3_zmenaRadkovani()
   h = 90;
 
   // uděláme kolem něj fialový rámeček
-  tft->drawRect( x-1, y-1, w+2, h+2, TP_MAGENTA );
+  tft->drawRect( x-1, y-1, w+2, h+2, EG_MAGENTA );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 125, (char*)"Zvětšené řádkování +5 px");
 
   painter->startText( x, y, w, h );
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   painter->printText( (char*)"Ó, náhlý déšť teď zvířil prach a čilá laň s houfcem gazel běží k úkrytům. Loď čeří kýlem tůň obzvlášť v Grónské úžině.");
 
 }
@@ -246,15 +250,15 @@ void demo4_upravyRadkovaniFontu2()
 
   painter->setFont( &malePismo );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 5, (char*)"Ukázka úprav řádkování 1");
 
   // font beze změn
   TpFontConfig frederica1;
   painter->createFontConfig( &frederica1, &FrederickatheGreat_Regular40pt8b );
   painter->setFont( &frederica1 );
-  painter->fillBackground( TP_WHITE );
-  tft->setTextColor(TP_RED);
+  painter->fillBackground( EG_WHITE );
+  tft->setTextColor(EG_RED);
 #define Y_START_DEMO3 30
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, Y_START_DEMO3, (char*)"Ahoj");
 
@@ -273,10 +277,10 @@ void demo4_upravyRadkovaniFontu2()
   // ---- jako textové bloky
   painter->setFont( &malePismo );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 100, (char*)"Ukázka úpravy řádkování 2");
 
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
 
   // rozměry textového bloku
   int x = 5;
@@ -284,7 +288,7 @@ void demo4_upravyRadkovaniFontu2()
   int w = 100;
   int h = 150;
 
-  tft->drawRect( x-1, y-1, w+2, h+2, TP_MAGENTA );
+  tft->drawRect( x-1, y-1, w+2, h+2, EG_MAGENTA );
   painter->setFont( &frederica1 );
   painter->startText( x, y, w, h );
   painter->printText( (char*)"Ahoj");
@@ -294,7 +298,7 @@ void demo4_upravyRadkovaniFontu2()
   // u tohohle boxu bude odstup řádek menší; ale první řádka začne s větším odstupem od hořejška
 
   x = 135;
-  tft->drawRect( x-1, y-1, w+2, h+2, TP_MAGENTA );
+  tft->drawRect( x-1, y-1, w+2, h+2, EG_MAGENTA );
   painter->setFont( &frederica2 );
   painter->startText( x, y, w, h );
   painter->printText( (char*)"Ahoj");
@@ -311,23 +315,23 @@ void demo5_horizontalBar()
 {
   painter->setFont( &malePismo );
 
-  tft->setTextColor(TP_GREEN);
+  tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 5, (char*)"Horizontal bar");
 
-  HbColorProfile c11( 0.0, TP_WHITE, TP_WHITE, TP_BLACK, TP_WHITE, TP_WHITE, TP_BLACK );
-  HbColorProfile c12( 1440.0, TP_YELLOW, TP_YELLOW, TP_BLACK, TP_YELLOW, TP_YELLOW, TP_BLACK );
-  HbColorProfile c13( 2160.0, TP_RED, TP_RED, TP_WHITE, TP_RED, TP_RED, TP_BLACK );
+  HbColorProfile c11( 0.0, EG_WHITE, EG_WHITE, EG_BLACK, EG_WHITE, EG_WHITE, EG_BLACK );
+  HbColorProfile c12( 1440.0, EG_YELLOW, EG_YELLOW, EG_BLACK, EG_YELLOW, EG_YELLOW, EG_BLACK );
+  HbColorProfile c13( 2160.0, EG_RED, EG_RED, EG_WHITE, EG_RED, EG_RED, EG_BLACK );
   // musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně
   HbColorProfile *colors1[] = { &c11, &c12, &c13, NULL };
 
-  HbColorProfile c21( 0.0, TP_WHITE, TP_YELLOW, TP_WHITE, TP_BLACK, TP_WHITE, TP_BLACK );
-  HbColorProfile c22( 1440.0, TP_YELLOW, TP_YELLOW, TP_YELLOW, TP_BLACK, TP_YELLOW, TP_BLACK );
-  HbColorProfile c23( 2160.0, TP_RED, TP_YELLOW, TP_RED, TP_BLACK, TP_WHITE, TP_BLACK );
-  HbColorProfile c24( 2400.0, TP_MAGENTA, TP_YELLOW, TP_RED, TP_BLACK, TP_WHITE, TP_BLACK );
+  HbColorProfile c21( 0.0, EG_WHITE, EG_YELLOW, EG_WHITE, EG_BLACK, EG_WHITE, EG_BLACK );
+  HbColorProfile c22( 1440.0, EG_YELLOW, EG_YELLOW, EG_YELLOW, EG_BLACK, EG_YELLOW, EG_BLACK );
+  HbColorProfile c23( 2160.0, EG_RED, EG_YELLOW, EG_RED, EG_BLACK, EG_WHITE, EG_BLACK );
+  HbColorProfile c24( 2400.0, EG_MAGENTA, EG_YELLOW, EG_RED, EG_BLACK, EG_WHITE, EG_BLACK );
   // musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně
   HbColorProfile *colors2[] = { &c21, &c22, &c23, &c24, NULL };
 
-  tft->setTextColor(TP_WHITE);
+  tft->setTextColor(EG_WHITE);
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, 30, (char*)"Výkon (0-2400 W, overload až 3000 W):");
 
   HorizontalBar hb1( tft, painter );
@@ -381,33 +385,250 @@ void demo5_horizontalBar()
 }
 
 
+void demo6_smallChart1() 
+{
+  painter->setFont( &malePismo );
+  tft->setTextColor(EG_GREEN);
+
+  ChartDatasource * data = new ChartDatasource(250);
+
+  ChColorProfile chc1( 0.0, EG_WHITE );
+  ChColorProfile chc2( 1440.0, EG_YELLOW );
+  ChColorProfile chc3( 2160.0, EG_RED );
+  ChColorProfile chc4( 2800.0, EG_MAGENTA );
+  // musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně
+  ChColorProfile *colors[] = { &chc1, &chc2, &chc3, &chc4, NULL };
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 20, (char*)"SmallChart - MODE_BAR");  
+
+  // tft->fillRect( 4, 39, 232, 62, EG_YELLOW );
+
+  SmallChart bch1( tft );
+  bch1.setRange( 0, 3000 );
+  bch1.setPosition( 5, 40, 230, 60 );
+  bch1.setDatasource( data );
+  bch1.setColors( EG_BLACK, EG_BLUE, colors );
+  // bch1.setSimpleColors( EG_BLACK, EG_BLUE, EG_RED );
+  bch1.setOptions( SmallChart::CHART_MODE_BAR | SmallChart::CHART_BORDERS | SmallChart::CHART_COLORS_HBAR );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 110, (char*)"SmallChart - MODE_LINE");  
+  
+  // tft->fillRect( 4, 129, 232, 52, EG_YELLOW );
+
+  SmallChart bch2( tft );
+  bch2.setRange( 0, 3000 );
+  bch2.setPosition( 5, 130, 230, 50 );
+  bch2.setDatasource( data );
+  bch2.setColors( EG_BLACK, EG_BLUE, colors );
+  bch2.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_BOTTOM_BORDER | SmallChart::CHART_LEFT_BORDER );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 190, (char*)"SmallChart - MODE_LINE");  
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 205, (char*)"+ 2WIDTH + resolution=2");  
+
+  // tft->fillRect( 4, 224, 232, 52, EG_YELLOW );
+
+  SmallChart bch3( tft );
+  bch3.setRange( 0, 3000 );
+  bch3.setPosition( 5, 225, 230, 50 );
+  bch3.setResolution( 2 );
+  bch3.setDatasource( data );
+  bch3.setColors( EG_BLACK, EG_BLUE, colors );
+  bch3.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_LINE_2WIDTH | SmallChart::CHART_BORDERS | SmallChart::CHART_BOTTOM_BORDER | SmallChart::CHART_LEFT_BORDER  );
+
+  float f = 0;
+
+  while( f<35 ) {
+
+    for( int i=0; i<20; i++ ) {
+      float v = sin(f) * 1500.0 + f*50 + 1000;
+      f += 0.05;
+      data->put( v );
+    }
+
+    bch1.draw();
+    bch2.draw();
+    bch3.draw();
+
+    delay(500);
+
+  }
+
+}
+
+
+
+void demo7_smallChart_bar() 
+{
+  painter->setFont( &malePismo );
+  tft->setTextColor(EG_GREEN);
+
+  ChartDatasource * data = new ChartDatasource(250);
+
+  ChColorProfile chc1( 0.0, EG_WHITE );
+  ChColorProfile chc2( 1440.0, EG_YELLOW );
+  ChColorProfile chc3( 2160.0, EG_RED );
+  ChColorProfile chc4( 2800.0, EG_MAGENTA );
+  // musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně
+  ChColorProfile *colors[] = { &chc1, &chc2, &chc3, &chc4, NULL };
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 20, (char*)"Bar - přes border");  
+
+  //tft->drawRect( 4, 39, 232, 62, EG_YELLOW );
+  //tft->drawRect( 5, 40, 230, 60, EG_RED );
+
+  SmallChart bch1( tft );
+  bch1.setRange( 0, 3000 );
+  bch1.setPosition( 5, 40, 230, 60 );
+  bch1.setResolution( 1 );
+  bch1.setDatasource( data );
+  bch1.setColors( EG_BLACK, EG_BLUE, colors );
+  bch1.setOptions( SmallChart::CHART_MODE_BAR | SmallChart::CHART_BORDERS );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 110, (char*)"Bar - pouze v rámečku");  
+  
+  // tft->fillRect( 4, 129, 232, 52, EG_YELLOW );
+
+  SmallChart bch2( tft );
+  bch2.setRange( 0, 3000 );
+  bch2.setPosition( 5, 130, 230, 60 );
+  bch2.setResolution( 1 );
+  bch2.setDatasource( data );
+  bch2.setColors( EG_BLACK, EG_BLUE, colors );
+  bch2.setOptions( SmallChart::CHART_MODE_BAR | SmallChart::CHART_BORDERS | SmallChart::CHART_BOTTOM_NOT_MIN | SmallChart::CHART_TOP_NOT_MAX );
+
+  float f = 0;
+
+  while( f<35 ) {
+
+    for( int i=0; i<20; i++ ) {
+      float v = sin(f) * 1500.0 + f*50 + 1000;
+      f += 0.05;
+      data->put( v );
+    }
+
+    bch1.draw();
+    bch2.draw();
+
+    delay(500);
+  }
+
+}
+
+
+void demo8_smallChart_line() 
+{
+  painter->setFont( &malePismo );
+  tft->setTextColor(EG_GREEN);
+
+  ChartDatasource * data = new ChartDatasource(250);
+
+  ChColorProfile chc1( 0.0, EG_WHITE );
+  ChColorProfile chc2( 1440.0, EG_YELLOW );
+  ChColorProfile chc3( 2160.0, EG_RED );
+  ChColorProfile chc4( 2800.0, EG_MAGENTA );
+  // musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně
+  ChColorProfile *colors[] = { &chc1, &chc2, &chc3, &chc4, NULL };
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 10, (char*)"Line - přes border + SimpleColors");  
+
+  /**
+  Zde ukazano, ze barvy neni nutne definovat jen tabulkou; je mozne mit jednoduchou konfiguraci jen se tremi barvami
+  */
+  SmallChart bch1( tft );
+  bch1.setRange( 0, 3000 );
+  bch1.setPosition( 5, 30, 230, 50 );
+  bch1.setResolution( 1 );
+  bch1.setDatasource( data );
+  // pouziti setSimpleColors
+  bch1.setSimpleColors( EG_BLACK, EG_BLUE, EG_WHITE );
+  bch1.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_BORDERS );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 90, (char*)"Line - vevnitř");  
+  
+  SmallChart bch2( tft );
+  bch2.setRange( 0, 3000 );
+  bch2.setPosition( 5, 110, 230, 50 );
+  bch2.setResolution( 1 );
+  bch2.setDatasource( data );
+  bch2.setColors( EG_BLACK, EG_BLUE, colors );
+  bch2.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_BORDERS | SmallChart::CHART_BOTTOM_NOT_MIN | SmallChart::CHART_TOP_NOT_MAX );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 170, (char*)"Line - vevnitř + tlustá");  
+
+  SmallChart bch3( tft );
+  bch3.setRange( 0, 3000 );
+  bch3.setPosition( 5, 190, 225, 50 );
+  bch3.setResolution( 1 );
+  bch3.setDatasource( data );
+  bch3.setColors( EG_BLACK, EG_BLUE, colors );
+  bch3.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_LINE_2WIDTH | SmallChart::CHART_BORDERS | SmallChart::CHART_BOTTOM_NOT_MIN | SmallChart::CHART_TOP_NOT_MAX  );
+
+  float f = 0;
+
+  while( f<35 ) {
+
+    for( int i=0; i<20; i++ ) {
+      float v = sin(f) * 1500.0 + f*50 + 1000;
+      f += 0.05;
+      data->put( v );
+    }
+
+    bch1.draw();
+    bch2.draw();
+    bch3.draw();
+
+    delay(500);
+  }
+
+}
+
+
+
 void loop() {
   
+  Serial.println( "5 horizontal bar");
+  tft->fillScreen(EG_BLACK);
+  demo5_horizontalBar();
+  // no delay
+
+  Serial.println( "6 chart1");
+  tft->fillScreen(EG_BLACK);
+  demo6_smallChart1();
+  // no delay
+
+  Serial.println( "7 chart - bar");
+  tft->fillScreen(EG_BLACK);
+  demo7_smallChart_bar();
+  // no delay
+
+  Serial.println( "8 chart - line");
+  tft->fillScreen(EG_BLACK);
+  demo8_smallChart_line();
+  // no delay
+
   Serial.println( "1 textovy blok");
-  tft->fillScreen(TP_BLACK);
+  tft->fillScreen(EG_BLACK);
   demo1_zakladniTextovyBlok();
   delay( 15000 );
 
   Serial.println( "2 labely");
-  tft->fillScreen(TP_BLACK);
+  tft->fillScreen(EG_BLACK);
   demo2_labely();
   delay( 15000 );
 
   Serial.println( "3 zmena radkovani");
-  tft->fillScreen(TP_BLACK);
+  tft->fillScreen(EG_BLACK);
   demo3_zmenaRadkovani();
   delay( 15000 );
 
   Serial.println( "4 radkovani");
-  tft->fillScreen(TP_BLACK);
+  tft->fillScreen(EG_BLACK);
   demo4_upravyRadkovaniFontu2();
   delay( 15000 );
 
-  Serial.println( "5 horizontal bar");
-  tft->fillScreen(TP_BLACK);
-  demo5_horizontalBar();
-
 }
+
+
 
 
 /*
