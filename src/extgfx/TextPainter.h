@@ -27,16 +27,6 @@
 #define MAX_DELKA_SLOVA_CO_SE_NEZALAMUJE 4
 
 
-// zakladni barvy - Adafruit_GFX pracuje s 16bit barvami 5-6-5
-#define	TP_BLACK   0x0000
-#define	TP_BLUE    0x001F
-#define	TP_RED     0xF800
-#define	TP_GREEN   0x07E0
-#define TP_CYAN    0x07FF
-#define TP_MAGENTA 0xF81F
-#define TP_YELLOW  0xFFE0
-#define TP_WHITE   0xFFFF
-
 
 /** Objekt držící konfiguraci typu písma a nastavení řádkování. */
 class TpFontConfig {
