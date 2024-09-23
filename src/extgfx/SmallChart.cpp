@@ -147,7 +147,6 @@ void SmallChart::draw(bool force)
     
     bool barChartSHorizontalnimiPruhy = (this->options & SmallChart::CHART_COLORS_HBAR) && (this->options & SmallChart::CHART_MODE_BAR);
 
-
     if( barChartSHorizontalnimiPruhy ) {
         // předpočteme si barevnou tabulku
         int prevSize = 0;
@@ -243,13 +242,10 @@ void SmallChart::draw(bool force)
         for( int j = 0; j < this->pixelsPerDatapoint; j++ ) {
 
             if( this->options & SmallChart::CHART_MODE_LINE ) {
-
                 // line chart
 
                 int pixY = dy + dh - size - 1;
-                
                 this->display->drawPixel( pixX, pixY, color->color );
-
                 if( this->options & SmallChart::CHART_LINE_2WIDTH ) {
                     if( dh==(size+1) ) {
                         // jsme uplne nahore, musime pridat jeden bod navic dolu pod caru
@@ -259,11 +255,11 @@ void SmallChart::draw(bool force)
                         this->display->drawPixel( pixX, pixY-1, color->color );
                     }
                 }
+                // konec line chartu
             } else {
                 // bar chart
 
                 int pixYstart = dy+dh -1;
-
                 if( !barChartSHorizontalnimiPruhy ) {
                     if( prepisujemeSpodniBorder ) {
                         if( size==0 ) {
@@ -293,7 +289,8 @@ void SmallChart::draw(bool force)
                 if( size < (dh-1) ) {
                     this->display->drawFastVLine( pixX, dy+fillTop, dh-size-1-fillTop, this->background );
                 }
-            }
+                // konec bar chartu
+            } 
 
             offset++;
             pixX++;
@@ -305,6 +302,8 @@ void SmallChart::draw(bool force)
         }
     }
 
+    // bar chart: pokud neni vykreslen na celou šířku, vymazat zbytek kreslícího pole 
+    // (pro line chart se nemusí dělat, tam se maže na začátku celé pole)
     if( offset < dw && (this->options & SmallChart::CHART_MODE_BAR) ) {
         this->display->fillRect( dx+offset, dy+fillTop, dw-offset, dh-1-fillTop, this->background );
     }

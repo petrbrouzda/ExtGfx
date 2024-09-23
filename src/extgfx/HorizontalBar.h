@@ -8,6 +8,7 @@
 
 /**
 Draws a bar with text.
+Ukázka v ExtGfx.ino v demo5_horizontalBar()
 
 Colors:
 - colorBar - color of bar
@@ -47,6 +48,8 @@ else it is printer after bar:
 /**
  * Barevný profil - sada barev pro jednotlivé zobrazované hodnoty. 
  * Předává se do HorizontalBar.setColors() jako pole pointerů na HbColorProfile.
+ * Vysvětlení role jednotlivých barev v prvním komentáři v HorizontalBar.h
+ * Demo/vysvětlení v ExtGfx.ino v demo5_horizontalBar()
  */
 class HbColorProfile {
     public:

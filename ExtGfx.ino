@@ -14,13 +14,11 @@
 #include <math.h>
 
 // parametry pripojeni displeje
-
 #define TFT_CS   3
 #define TFT_RST  2
 #define TFT_DC   1
 #define TFT_MOSI 6
 #define TFT_SCLK 4
-
 #define SPI_MISO_UNUSED -1
 
 // LOW = vypnuto, HIGH = zapnuto
@@ -311,6 +309,17 @@ void demo4_upravyRadkovaniFontu2()
 }
 
 
+  /**
+   * Horizontal bar.
+   * 
+   * Demo: Ukázka indikátoru výkonu střídače.
+   * Střídač má nominální výkon 0 - 2400 W, ale krátkodobě dokáže dodávat až 3000 W.
+   * Overload režim můžeme znázornit jinou barvou (viz profil colors2).
+   *
+   * První dva bary budou ukazovat jen výkon 0-2400 W a při overloadu už zůstanou na 100 %
+   * (a první nerozlišuje barevně mezi běžným výkonem a overloadem, druhý naopak při overloadu 
+   * přejde do fialové), třetí ukáže plný rozsah 0-3000.
+   */
 void demo5_horizontalBar()
 {
   painter->setFont( &malePismo );
@@ -318,12 +327,28 @@ void demo5_horizontalBar()
   tft->setTextColor(EG_GREEN);
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 5, (char*)"Horizontal bar");
 
+  /**
+   * Barevný profil:
+   * - pro nejnižší hodnoty je bílá barva
+   * - pro rozsah 1440-2160 je žlutá
+   * - pro víc než 2160 je červená
+   * 
+   * Je možné pro jednotlivé rozsahy hodnot nezávisle nastravit barvu baru, pozadí, textu a rámečku.
+   * 
+   */
   HbColorProfile c11( 0.0, EG_WHITE, EG_WHITE, EG_BLACK, EG_WHITE, EG_WHITE, EG_BLACK );
   HbColorProfile c12( 1440.0, EG_YELLOW, EG_YELLOW, EG_BLACK, EG_YELLOW, EG_YELLOW, EG_BLACK );
   HbColorProfile c13( 2160.0, EG_RED, EG_RED, EG_WHITE, EG_RED, EG_RED, EG_BLACK );
   // musi byt zakoncene NULLem; hodnoty musí být seřazené vzestupně
   HbColorProfile *colors1[] = { &c11, &c12, &c13, NULL };
 
+  /**
+   * Barevný profil:
+   * - pro nejnižší hodnoty je bílá barva
+   * - pro rozsah 1440-2160 je žlutá
+   * - pro 2160-2400 je červená
+   * - pro víc než 2400 (overload) je fialová
+   */
   HbColorProfile c21( 0.0, EG_WHITE, EG_YELLOW, EG_WHITE, EG_BLACK, EG_WHITE, EG_BLACK );
   HbColorProfile c22( 1440.0, EG_YELLOW, EG_YELLOW, EG_YELLOW, EG_BLACK, EG_YELLOW, EG_BLACK );
   HbColorProfile c23( 2160.0, EG_RED, EG_YELLOW, EG_RED, EG_BLACK, EG_WHITE, EG_BLACK );
@@ -335,36 +360,40 @@ void demo5_horizontalBar()
   painter->printLabel( TextPainter::ALIGN_LEFT, 5, 30, (char*)"Výkon (0-2400 W, overload až 3000 W):");
 
   HorizontalBar hb1( tft, painter );
-  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; budeme ukazovat jen zakladni rozsah
+  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; budeme ukazovat jen zakladni rozsah 0-2400
   hb1.setRange( 0, 2400 );
   hb1.setPosition( 5, 50, 230, 20 );
   hb1.setColors( (HbColorProfile**)&colors1 );
   hb1.setFont( &malePismo );
 
   HorizontalBar hb2( tft, painter );
-  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; budeme ukazovat jen zakladni rozsah
+  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; budeme ukazovat jen zakladni rozsah 0-2400
   hb2.setRange( 0, 2400 );
   hb2.setPosition( 5, 75, 230, 35 );
   hb2.setColors( (HbColorProfile**)&colors2 );
   hb2.setFont( &vetsiPismo );
 
   HorizontalBar hb3( tft, painter );
-  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; zde ukazeme cely rozsah
+  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; zde ukazeme cely rozsah 0-3000
   hb3.setRange( 0, 3000 );
   hb3.setPosition( 5, 115, 230, 25 );
   hb3.setColors( (HbColorProfile**)&colors2 );
   hb3.setFont( &malePismo );
 
-  for( int i=0; i<2; i++ )  {
 
+  /*
+   * Všimněte si, že text se do baru nastavuje nezávisle na číselné hodnotě.
+   * Tak je možné renderovat například odlišný text při různých hodnotách.
+   */
+  for( int i=0; i<2; i++ )  {
     for( float f = 0; f<3000.0; f += 135.0 ) {
       char buf[15];
       sprintf( buf, "%.0f W", f );
       hb1.setValue( f, buf );
-      hb1.draw();
       hb2.setValue( f, buf );
-      hb2.draw();
       hb3.setValue( f, buf );
+      hb1.draw();
+      hb2.draw();
       hb3.draw();
       delay( 500 );
     }
@@ -372,19 +401,21 @@ void demo5_horizontalBar()
       char buf[15];
       sprintf( buf, "%.0f W", f );
       hb1.setValue( f, buf );
-      hb1.draw();
       hb2.setValue( f, buf );
-      hb2.draw();
       hb3.setValue( f, buf );
+      hb1.draw();
+      hb2.draw();
       hb3.draw();
       delay( 500 );
     }
 
   }
-  
 }
 
 
+/**
+ * Základní ukázka grafů s barevným rozlišením dat.
+ */
 void demo6_smallChart1() 
 {
   painter->setFont( &malePismo );
@@ -392,6 +423,9 @@ void demo6_smallChart1()
 
   ChartDatasource * data = new ChartDatasource(250);
 
+/*
+ * Zde je barevný profil. Hodnoty do 1440 budou bílé, mezi 1440 a 2160 žluté, 2160-2800 červené a vyšší budou fialové.
+ */
   ChColorProfile chc1( 0.0, EG_WHITE );
   ChColorProfile chc2( 1440.0, EG_YELLOW );
   ChColorProfile chc3( 2160.0, EG_RED );
@@ -401,8 +435,9 @@ void demo6_smallChart1()
 
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 20, (char*)"SmallChart - MODE_BAR");  
 
-  // tft->fillRect( 4, 39, 232, 62, EG_YELLOW );
-
+  /*
+   * Tento graf je vyplněný a má barevně odlišené třídy hodnot (třeba: standardní běh, plný výkon, přetížení).
+   */
   SmallChart bch1( tft );
   bch1.setRange( 0, 3000 );
   bch1.setPosition( 5, 40, 230, 60 );
@@ -413,8 +448,9 @@ void demo6_smallChart1()
 
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 110, (char*)"SmallChart - MODE_LINE");  
   
-  // tft->fillRect( 4, 129, 232, 52, EG_YELLOW );
-
+  /*
+   * Tento graf je čárový (tenkou čárou) a má barevně odlišené třídy hodnot (třeba: standardní běh, plný výkon, přetížení).
+   */
   SmallChart bch2( tft );
   bch2.setRange( 0, 3000 );
   bch2.setPosition( 5, 130, 230, 50 );
@@ -425,8 +461,11 @@ void demo6_smallChart1()
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 190, (char*)"SmallChart - MODE_LINE");  
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 205, (char*)"+ 2WIDTH + resolution=2");  
 
-  // tft->fillRect( 4, 224, 232, 52, EG_YELLOW );
-
+  /*
+   * Tento graf je čárový (tenkou čárou) a má barevně odlišené třídy hodnot (třeba: standardní běh, plný výkon, přetížení).
+   * Je použitá čára o tloušťce dvou bodů.
+   * Je nastaveno měřítko "dva pixely na šířku pro jeden bod v datech", takže graf jede 2x rychleji
+   */
   SmallChart bch3( tft );
   bch3.setRange( 0, 3000 );
   bch3.setPosition( 5, 225, 230, 50 );
@@ -436,9 +475,7 @@ void demo6_smallChart1()
   bch3.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_LINE_2WIDTH | SmallChart::CHART_BORDERS | SmallChart::CHART_BOTTOM_BORDER | SmallChart::CHART_LEFT_BORDER  );
 
   float f = 0;
-
   while( f<35 ) {
-
     for( int i=0; i<20; i++ ) {
       float v = sin(f) * 1500.0 + f*50 + 1000;
       f += 0.05;
@@ -450,15 +487,26 @@ void demo6_smallChart1()
     bch3.draw();
 
     delay(500);
-
   }
 
 }
 
 
-
+/**
+  Zde je ukázán rozdíl v tom, jak se renderuje graf kolem rámečku.
+  Dolní border může mít roli "spodní osy", tj. nejnižší hodnota se vykresluje přes osu (pak je
+  doporučené, aby byla barevně kontrastní), nebo může mít roli čistě rámečku a data se vykreslují
+  nad ním. Dtto se týká horního okraje, pokud je použit - nejvyšší hodnoty mohou zasahovat až přes 
+  něj a přepisovat ho, nebo naopak vždy končí pod ním.
+  Přepis horního a dolního rámečku je defaultní stav.
+  Pokud to nechcete, dejte do options:
+  SmallChart::CHART_BOTTOM_NOT_MIN - nepřepisovat spodní rámeček
+  SmallChart::CHART_TOP_NOT_MAX - nepřepisovat horní rámeček
+  */
 void demo7_smallChart_bar() 
 {
+
+
   painter->setFont( &malePismo );
   tft->setTextColor(EG_GREEN);
 
@@ -473,9 +521,6 @@ void demo7_smallChart_bar()
 
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 20, (char*)"Bar - přes border");  
 
-  //tft->drawRect( 4, 39, 232, 62, EG_YELLOW );
-  //tft->drawRect( 5, 40, 230, 60, EG_RED );
-
   SmallChart bch1( tft );
   bch1.setRange( 0, 3000 );
   bch1.setPosition( 5, 40, 230, 60 );
@@ -486,8 +531,6 @@ void demo7_smallChart_bar()
 
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 110, (char*)"Bar - pouze v rámečku");  
   
-  // tft->fillRect( 4, 129, 232, 52, EG_YELLOW );
-
   SmallChart bch2( tft );
   bch2.setRange( 0, 3000 );
   bch2.setPosition( 5, 130, 230, 60 );
@@ -514,9 +557,23 @@ void demo7_smallChart_bar()
 
 }
 
+/**
+  Zde je ukázán rozdíl v tom, jak se renderuje graf kolem rámečku.
+  Dolní border může mít roli "spodní osy", tj. nejnižší hodnota se vykresluje přes osu (pak je
+  doporučené, aby byla barevně kontrastní), nebo může mít roli čistě rámečku a data se vykreslují
+  nad ním. Dtto se týká horního okraje, pokud je použit - nejvyšší hodnoty mohou zasahovat až přes 
+  něj a přepisovat ho, nebo naopak vždy končí pod ním.
+  Přepis horního a dolního rámečku je defaultní stav.
+  Pokud to nechcete, dejte do options:
+  SmallChart::CHART_BOTTOM_NOT_MIN - nepřepisovat spodní rámeček
+  SmallChart::CHART_TOP_NOT_MAX - nepřepisovat horní rámeček
 
+  Nejspodnější graf používá tlustší čáru, horní dva tenkou.
+  */
 void demo8_smallChart_line() 
 {
+
+
   painter->setFont( &malePismo );
   tft->setTextColor(EG_GREEN);
 
@@ -584,8 +641,62 @@ void demo8_smallChart_line()
 
 
 
+/**
+ * Úvodní ukázka ke grafům.
+ */
+void demo9_smallChart() 
+{
+  painter->setFont( &malePismo );
+  tft->setTextColor(EG_GREEN);
+
+  ChartDatasource * data = new ChartDatasource(250);
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 20, (char*)"SmallChart - vyplněný graf");  
+
+  SmallChart bch1( tft );
+  bch1.setRange( 0, 3000 );
+  bch1.setPosition( 5, 40, 230, 60 );
+  bch1.setDatasource( data );
+  bch1.setOptions( SmallChart::CHART_MODE_BAR | SmallChart::CHART_BORDERS | SmallChart::CHART_COLORS_HBAR );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 110, (char*)"SmallChart - čárový graf");  
+  
+  SmallChart bch2( tft );
+  bch2.setRange( 0, 3000 );
+  bch2.setPosition( 5, 130, 230, 60 );
+  bch2.setDatasource( data );
+  bch2.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_BOTTOM_BORDER | SmallChart::CHART_LEFT_BORDER | SmallChart::CHART_LINE_2WIDTH  );
+
+  painter->printLabel( TextPainter::ALIGN_CENTER, 120, 210, (char*)"(základní ukázka, bez barev)");  
+
+
+  float f = 0;
+  while( f<35 ) {
+
+    for( int i=0; i<3; i++ ) {
+      float v = sin(f) * 1500.0 + f*50 + 1000;
+      f += 0.05;
+      data->put( v );
+    }
+
+    bch1.draw();
+    bch2.draw();
+
+    delay(40);
+  }
+
+}
+
+
+
+
 void loop() {
   
+  Serial.println( "6 chart1");
+  tft->fillScreen(EG_BLACK);
+  demo9_smallChart();
+  // no delay
+
   Serial.println( "5 horizontal bar");
   tft->fillScreen(EG_BLACK);
   demo5_horizontalBar();

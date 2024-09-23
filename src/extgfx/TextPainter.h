@@ -11,6 +11,12 @@
  * 
  * Tiskne na jakékoli zařízení implementující Adafruit_GFX rozhraní (LCD displeje, ePaper displeje) nebo do canvasu, 
  * podle toho, co dostane jako parametr.
+ * 
+ * Ukázka v ExtGfx.ino ve funkcích 
+ * - demo1_zakladniTextovyBlok()
+ * - demo2_labely()
+ * - demo3_zmenaRadkovani()
+ * - demo4_upravyRadkovaniFontu2()
  */
 
 #include <Arduino.h>
