@@ -59,7 +59,9 @@ void TextPainter::createFontConfig( TpFontConfig *target, const GFXfont *font )
     */
 
    target->font = font;
-   target->lineHeight = h + 1;
+   int changeLH = (int)(0.1 * (float)h );
+   if( changeLH==0 ) changeLH=1;
+   target->lineHeight = h + 1 + changeLH;
    target->firstLineHeightOffset = - (h + y1 - 1);
    target->baselineOffset = -y1;
    target->underBaseline = h+y1;

@@ -377,8 +377,17 @@ void demo5_horizontalBar()
   // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; zde ukazeme cely rozsah 0-3000
   hb3.setRange( 0, 3000 );
   hb3.setPosition( 5, 115, 230, 25 );
-  hb3.setColors( (HbColorProfile**)&colors2 );
+  hb3.setColors( (HbColorProfile**)&colors1 );
   hb3.setFont( &malePismo );
+
+  // hodně úzký bar
+  HorizontalBar hb4( tft, painter );
+  // pracovni rozsah stridace je 0-2400 W, ve spicce 3000 W; zde ukazeme cely rozsah 0-3000
+  hb4.setRange( 0, 3000 );
+  hb4.setPosition( 5, 150, 230, 16 );
+  hb4.setColors( (HbColorProfile**)&colors1 );
+  hb4.setFont( &malePismo );
+
 
 
   /*
@@ -392,9 +401,11 @@ void demo5_horizontalBar()
       hb1.setValue( f, buf );
       hb2.setValue( f, buf );
       hb3.setValue( f, buf );
+      hb4.setValue( f, buf );
       hb1.draw();
       hb2.draw();
       hb3.draw();
+      hb4.draw();
       delay( 500 );
     }
     for( float f = 3000; f>=0; f -= 121.0 ) {
@@ -403,9 +414,11 @@ void demo5_horizontalBar()
       hb1.setValue( f, buf );
       hb2.setValue( f, buf );
       hb3.setValue( f, buf );
+      hb4.setValue( f, buf );
       hb1.draw();
       hb2.draw();
       hb3.draw();
+      hb4.draw();
       delay( 500 );
     }
 
@@ -702,6 +715,7 @@ void loop() {
   demo5_horizontalBar();
   // no delay
 
+
   Serial.println( "6 chart1");
   tft->fillScreen(EG_BLACK);
   demo6_smallChart1();
@@ -716,6 +730,7 @@ void loop() {
   tft->fillScreen(EG_BLACK);
   demo8_smallChart_line();
   // no delay
+
 
   Serial.println( "1 textovy blok");
   tft->fillScreen(EG_BLACK);
@@ -736,6 +751,7 @@ void loop() {
   tft->fillScreen(EG_BLACK);
   demo4_upravyRadkovaniFontu2();
   delay( 15000 );
+
 
 }
 

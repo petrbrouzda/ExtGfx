@@ -124,7 +124,7 @@ void HorizontalBar::draw(bool force)
     
     // textY = y + ( ( h - this->font->baselineOffset ) / 2 ) - 1;
     // + this->font->firstLineHeightOffset + 1
-    textY = y + ((h-textH)/2) ;
+    textY = y + ((h-textH)/2) + this->font->firstLineHeightOffset ;
 
     if( textOnBar ) {
         this->display->setTextColor( color->colorTextOnBar );
