@@ -704,7 +704,7 @@ void demo9_smallChart()
 
 
 void loop() {
-  
+    
   Serial.println( "6 chart1");
   tft->fillScreen(EG_BLACK);
   demo9_smallChart();
@@ -714,7 +714,6 @@ void loop() {
   tft->fillScreen(EG_BLACK);
   demo5_horizontalBar();
   // no delay
-
 
   Serial.println( "6 chart1");
   tft->fillScreen(EG_BLACK);
@@ -730,7 +729,6 @@ void loop() {
   tft->fillScreen(EG_BLACK);
   demo8_smallChart_line();
   // no delay
-
 
   Serial.println( "1 textovy blok");
   tft->fillScreen(EG_BLACK);
@@ -751,7 +749,6 @@ void loop() {
   tft->fillScreen(EG_BLACK);
   demo4_upravyRadkovaniFontu2();
   delay( 15000 );
-
 
 }
 

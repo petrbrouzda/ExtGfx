@@ -70,7 +70,7 @@ void TextPainter::createFontConfig( TpFontConfig *target, const GFXfont *font )
 
     #ifdef DUMP_DEBUG_INFO  
         Serial.printf( "createFontConfig: [%d,%d], w=%d, h=%d, font yAdv=%d\n", x1, y1, w, h, font->yAdvance );
-        Serial.printf( "createFontConfig out: flho=%d lho=%d \n", target->firstLineHeightOffset, target->lineHeightOffset );
+        Serial.printf( "createFontConfig out: flho=%d lh=%d \n", target->firstLineHeightOffset, target->lineHeight );
     #endif
 }
 

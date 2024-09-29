@@ -1,5 +1,9 @@
 #include "HorizontalBar.h"
 
+// pokud se povoli, dumpuji se detailni informace o zalamovani
+// #define DUMP_DEBUG_INFO
+
+
 HbColorProfile::HbColorProfile(float valueFrom, uint16_t colorBar, uint16_t colorBorder, 
                             uint16_t colorTextOnBar, uint16_t colorBgOnBar, 
                             uint16_t colorTextOnBg, uint16_t bgColor)
@@ -89,46 +93,49 @@ void HorizontalBar::draw(bool force)
 
     // zde v color mam barvy
     this->display->startWrite();
-    this->display->writeFastHLine( x,  y  ,w, color->colorBorder );
-    this->display->writeFastHLine( x,  y+h,w, color->colorBorder );
-    this->display->writeFastVLine( x,  y,  h, color->colorBorder );
-    this->display->writeFastVLine( x+w,y,  h, color->colorBorder );
-    int size1 = (int)((double)w * value ) - 1;
+    this->display->writeFastHLine( this->x,  this->y  ,this->w, color->colorBorder );
+    this->display->writeFastHLine( this->x,  this->y+h,this->w, color->colorBorder );
+    this->display->writeFastVLine( this->x,  this->y,  this->h, color->colorBorder );
+    this->display->writeFastVLine( this->x+this->w,this->y,  this->h, color->colorBorder );
+    int size1 = (int)((double)(this->w) * value ) - 1;
     if( size1>0 ) {
-        this->display->writeFillRect( x+1, y+1, size1, h-1, color->colorBar );
+        this->display->writeFillRect( this->x+1, this->y+1, size1, this->h-1, color->colorBar );
     } else {
         size1 = 0;
     }
-    int size2 = w - size1 - 1;
+    int size2 = this->w - size1 - 1;
     if( size2>0 ) {
-        this->display->writeFillRect( x+1+size1, y+1, size2, h-1, color->bgColor );
+        this->display->writeFillRect( this->x+1+size1, this->y+1, size2, this->h-1, color->bgColor );
     }
     this->display->endWrite();
 
     int16_t x1, y1;
     uint16_t textW, textH;
-    this->painter->getTextBounds( (const char*)this->currentText, x, y, &x1, &y1, &textW, &textH );
+    this->painter->getTextBounds( (const char*)this->currentText, this->x, this->y, &x1, &y1, &textW, &textH );
 
     int textX, textY;
     bool textOnBar = false;
 
     if( textW < size1-20 ) {
         // text doprostred baru
-        textX = x + size1/2 - textW/2;
+        textX = this->x + size1/2 - textW/2;
         textOnBar = true;
     } else {
         // text hned za bar
-        textX = x + size1 + 5;
+        textX = this->x + size1 + 5;
     }
 
-    
-    // textY = y + ( ( h - this->font->baselineOffset ) / 2 ) - 1;
-    // + this->font->firstLineHeightOffset + 1
-    textY = y + ((h-textH)/2) + this->font->firstLineHeightOffset ;
+    int textH2 = this->font->lineHeight+this->font->firstLineHeightOffset;
+    textY = this->y + ((this->h - textH2)/2) - 1;
+
+#ifdef DUMP_DEBUG_INFO
+    Serial.printf( "h=%d, textH2=%d, ((h-textH2)/2)=%d, ", this->h, textH2, ((this->h-textH2)/2) );
+    Serial.printf( "fontLHO=%d, textY-y=%d ", this->font->firstLineHeightOffset, textY-this->y );
+    Serial.printf( "fontLH=%d \n", this->font->lineHeight );
+#endif
 
     if( textOnBar ) {
         this->display->setTextColor( color->colorTextOnBar );
-        // this->display->fillRect( textX, textY-textH, textW+1, textH+2, colorBgOnBar );
         if( color->colorBgOnBar != color->colorBar ) {
             this->painter->fillBackground( color->colorBgOnBar, 3 );
         } else {
@@ -136,7 +143,6 @@ void HorizontalBar::draw(bool force)
         }
     } else {
         this->display->setTextColor( color->colorTextOnBg );
-        // this->display->fillRect( textX, textY-textH, textW+1, textH+2, colorBgOnBg );
         this->painter->noBackground();
     }
 
