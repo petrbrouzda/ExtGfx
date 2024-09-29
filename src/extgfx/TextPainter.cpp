@@ -41,6 +41,7 @@ void TextPainter::createFontConfig( TpFontConfig *target, const GFXfont *font )
 
     this->display->setFont( font );
 
+    // sample text - characters with most diverse size over and under the textline
     char buffer[] = "MAjg096";
     this->display->getTextBounds( (const char*)buffer, 0, 0, &x1, &y1, &w, &h );
 
@@ -58,7 +59,7 @@ void TextPainter::createFontConfig( TpFontConfig *target, const GFXfont *font )
     */
 
    target->font = font;
-   target->lineHeight = h + 2;
+   target->lineHeight = h + 1;
    target->firstLineHeightOffset = - (h + y1 - 1);
    target->baselineOffset = -y1;
    target->underBaseline = h+y1;
