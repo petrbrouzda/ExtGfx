@@ -6,8 +6,8 @@ Několik ukázek:
 
 | Grafy      | Práce s textem      | Bar gauge |
 | ----------- | ----------- | ----------- |
-| <img src="doc/d9.jpg" width="300">  | <img src="doc/d1.jpg" width="300">   | <img src="doc/d5-1.jpg" width="300"> |
-| <img src="doc/d6.jpg" width="300">  | <img src="doc/d2.jpg" width="300">   | <img src="doc/d5-3.jpg" width="300"> |
+| <img src="doc/d6.jpg" width="300">  | <img src="doc/d1.jpg" width="300">   | <img src="doc/d5-1.jpg" width="300"> |
+| <img src="doc/d9.jpg" width="300">  | <img src="doc/d2.jpg" width="300">   | <img src="doc/d5-3.jpg" width="300"> |
 
 
 Knihovny jsou určené pro ESP32; asi budou fungovat i na ESP8266, ale nešetří pamětí.
