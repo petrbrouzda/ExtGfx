@@ -123,12 +123,17 @@ void HorizontalBar::draw(bool force)
 
     
     // textY = y + ( ( h - this->font->baselineOffset ) / 2 ) - 1;
-    textY = y + ((h-textH)/2) + this->font->firstLineHeightOffset;
+    // + this->font->firstLineHeightOffset + 1
+    textY = y + ((h-textH)/2) ;
 
     if( textOnBar ) {
         this->display->setTextColor( color->colorTextOnBar );
         // this->display->fillRect( textX, textY-textH, textW+1, textH+2, colorBgOnBar );
-        this->painter->fillBackground( color->colorBgOnBar, 3 );
+        if( color->colorBgOnBar != color->colorBar ) {
+            this->painter->fillBackground( color->colorBgOnBar, 3 );
+        } else {
+            this->painter->noBackground();    
+        }
     } else {
         this->display->setTextColor( color->colorTextOnBg );
         // this->display->fillRect( textX, textY-textH, textW+1, textH+2, colorBgOnBg );
