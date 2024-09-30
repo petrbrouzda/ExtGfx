@@ -1,7 +1,8 @@
 #include "TextPainter.h"
 
 // pokud se povoli, dumpuji se detailni informace o zalamovani
-// #define DUMP_DEBUG_INFO
+// 
+#define DUMP_DEBUG_INFO
 
 
 
@@ -97,7 +98,7 @@ void TextPainter::startText(int x, int y, int width, int height)
     }
     if( height==TP_MAX_SIZE 
         || height > this->display->height() - this->textBoxY - 1 ) {
-        this->textMaxY = this->display->height() - this->textBoxY - 1;
+        this->textMaxY = this->display->height() -1;
     } else {
         this->textMaxY = height + this->textBoxY;
     }
