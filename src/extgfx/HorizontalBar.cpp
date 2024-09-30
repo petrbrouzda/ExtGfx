@@ -162,3 +162,8 @@ void HorizontalBar::setDirty()
 {
     this->dirty = true;
 }
+
+bool HorizontalBar::willRedraw()
+{
+    return this->dirty;
+}

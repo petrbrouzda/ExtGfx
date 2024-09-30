@@ -1,7 +1,6 @@
 #ifndef _HORIZONTALBAR___H_
 #define _HORIZONTALBAR___H_
 
-#include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include "TextPainter.h"
 
@@ -122,6 +121,9 @@ class HorizontalBar {
 
         /** Nastaví prvek k překreslení při příštím draw(), i když se nezměnily data. */
         void setDirty();
+
+        /** vrátí informaci, zda se bude vykreslovat - tj. je dirty */
+        bool willRedraw();
 
     private:
         Adafruit_GFX *display;
