@@ -1,8 +1,7 @@
 #include "TextPainter.h"
 
 // pokud se povoli, dumpuji se detailni informace o zalamovani
-// 
-#define DUMP_DEBUG_INFO
+// #define DUMP_DEBUG_INFO
 
 
 
