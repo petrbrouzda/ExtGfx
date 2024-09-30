@@ -1,4 +1,5 @@
 #include "SmallChart.h"
+#include <math.h>
 
 // pokud se povoli, dumpuji se detailni informace o zalamovani
 //  #define DUMP_DEBUG_INFO
@@ -9,6 +10,7 @@ SmallChart::SmallChart( Adafruit_GFX *display )
 {
     this->display = display;
     this->pixelsPerDatapoint = 1;
+    this->pixelsSpacing = 0;
     this->options = SmallChart::CHART_BORDERS | SmallChart::CHART_MODE_BAR;
     this->dfltColors[0] = &this->dfltCp;
     this->dfltColors[1] = NULL;
@@ -34,9 +36,10 @@ void SmallChart::setPosition( int x, int y, int w, int h )
     this->w = w;
 }
 
-void SmallChart::setResolution(int pixelsPerDatapoint)
+void SmallChart::setResolution(int pixelsPerDatapoint, int pixelsSpacing)
 {
     this->pixelsPerDatapoint = pixelsPerDatapoint;
+    this->pixelsSpacing = pixelsSpacing;
 }
 
 void SmallChart::setColors(uint16_t background, uint16_t border, ChColorProfile **colors)
@@ -59,6 +62,33 @@ void SmallChart::setOptions(int options)
     this->options = options;
 }
 
+void SmallChart::autoRange( bool setLowLimitToZero )
+{
+    float minVal, maxVal;
+    bool first = true;
+    for( int i = 0; i<this->dataSrc->getNumItems(); i++ ) {
+        float v = this->dataSrc->getItem(i);
+        if( ! isnan(v) ) {
+            if( !first ) {
+                if( v < minVal ) {
+                    minVal = v;
+                }
+                if( v > maxVal ) {
+                    maxVal = v;
+                }
+            } else {
+                minVal = v;
+                maxVal = v;
+                first = false;
+            }
+        }
+    }
+    if( setLowLimitToZero ) {
+        minVal = 0;
+    }
+    this->setRange( minVal, maxVal );
+}
+
 void SmallChart::setDatasource(ChartDatasource *datasource)
 {
     this->dataSrc = datasource;
@@ -78,6 +108,11 @@ int colorHbarColor[MAX_COLORS_PER_CHART];
 void vykresliSvislouPruhovanouCaru( int x, int y, int negativeSize, Adafruit_GFX *display )
 {
     int sz = -negativeSize;
+
+    if( sz==0 ) {
+        display->drawPixel( x, y , colorHbarColor[0] );
+        return;
+    }
     
     for( int i = 0; i<MAX_COLORS_PER_CHART; i++ ) {
         int currentSize = colorHbarSize[i];
@@ -202,9 +237,14 @@ void SmallChart::draw(bool force)
     int offset = 0;
     int pixX = dx;
 
-    for( int i=this->dataSrc->data->numElements(this->dataSrc->data)-1; i>=0 ; i-- ) {
+    //for( int i=this->dataSrc->getNumItems() - 1; i>=0 ; i-- ) {
+    for( int i=0; i<this->dataSrc->getNumItems(); i++ ) {
 
-        float v = * (float*)(this->dataSrc->data->peek(this->dataSrc->data, i));
+        float v = this->dataSrc->getItem(i);
+        // Serial.printf( " .. i=%d, pos=%d, val=%.1f\n", i, offset, v );
+        if( isnan(v) ) {
+            continue;
+        }
 
         ChColorProfile * color = this->colors[0];
         if( !barChartSHorizontalnimiPruhy  ) {
@@ -261,29 +301,13 @@ void SmallChart::draw(bool force)
 
                 int pixYstart = dy+dh -1;
                 if( !barChartSHorizontalnimiPruhy ) {
-                    if( prepisujemeSpodniBorder ) {
-                        if( size==0 ) {
-                            // graf jede po spodnim borderu
-                            this->display->drawPixel( pixX, pixYstart , color->color );
-                        } else {
-                            // zaciname o radek vys, aby zustal videt border
-                            this->display->drawFastVLine( pixX, pixYstart-1, -size, color->color );
-                        }
+                    if( size==0 ) {
+                        this->display->drawPixel( pixX, pixYstart, color->color );
                     } else {
-                        this->display->drawFastVLine( pixX, pixYstart , -size, color->color );
+                        this->display->drawFastVLine( pixX, pixYstart, -size, color->color );
                     }
                 } else {
-                    if( prepisujemeSpodniBorder ) {
-                        if( size==0 ) {
-                            // graf jede po spodnim borderu
-                            this->display->drawPixel( pixX, pixYstart , colorHbarColor[0] );
-                        } else {
-                            // zaciname o radek vys, aby zustal videt border
-                            vykresliSvislouPruhovanouCaru( pixX, pixYstart-1, -size, this->display );
-                        }
-                    } else {
-                        vykresliSvislouPruhovanouCaru( pixX, pixYstart, -size, this->display );
-                    }  
+                    vykresliSvislouPruhovanouCaru( pixX, pixYstart, -size, this->display );
                 }
                 
                 if( size < (dh-1) ) {
@@ -299,8 +323,31 @@ void SmallChart::draw(bool force)
                 // vykresleny cely graf
                 break;
             }
+        } // for( int j = 0; j < this->pixelsPerDatapoint; j++ ) {
+
+        if( offset >= dw ) {
+            // vykresleny cely graf
+            break;
         }
-    }
+
+        if( this->pixelsSpacing!=0 ) {
+            if( this->options & SmallChart::CHART_MODE_BAR ) {
+                for( int i=0; i<this->pixelsSpacing; i++ ) {
+                    this->display->drawFastVLine( pixX, dy+fillTop, size-1-fillTop, this->background );
+                    offset++;
+                    pixX++;
+                    if( offset >= dw ) {
+                        // vykresleny cely graf
+                        break;
+                    }
+                }
+            } else {
+                pixX += this->pixelsSpacing;
+                offset += this->pixelsSpacing;
+            }
+        }
+
+    } // for( int i=0; i<this->dataSrc->getNumItems(); i++ ) {
 
     // bar chart: pokud neni vykreslen na celou šířku, vymazat zbytek kreslícího pole 
     // (pro line chart se nemusí dělat, tam se maže na začátku celé pole)
@@ -312,20 +359,19 @@ void SmallChart::draw(bool force)
     this->dataVer = this->dataSrc->version;
 }
 
-ChartDatasource::ChartDatasource(int numItems)
+bool SmallChart::willRedraw()
 {
-    this->data = RingBuf_new(sizeof(float), numItems );
-    this->version = 0;
+    return this->dirty || this->dataSrc->version!=this->dataVer;
 }
 
-void ChartDatasource::put(float item )
+float SmallChart::getMinVal()
 {
-    if( this->data->isFull(this->data) ) {
-        float tmp;
-        this->data->pull(this->data, &tmp);
-    }
-    this->data->add( this->data, &item );
-    this->version++;
+    return this->minVal;
+}
+
+float SmallChart::getMaxVal()
+{
+    return this->maxVal;
 }
 
 ChColorProfile::ChColorProfile(float valueFrom, uint16_t color)

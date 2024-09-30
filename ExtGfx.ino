@@ -434,7 +434,7 @@ void demo6_smallChart1()
   painter->setFont( &malePismo );
   tft->setTextColor(EG_GREEN);
 
-  ChartDatasource * data = new ChartDatasource(250);
+  RingBufCDS * data = new RingBufCDS(250);
 
 /*
  * Zde je barevný profil. Hodnoty do 1440 budou bílé, mezi 1440 a 2160 žluté, 2160-2800 červené a vyšší budou fialové.
@@ -455,6 +455,8 @@ void demo6_smallChart1()
   bch1.setRange( 0, 3000 );
   bch1.setPosition( 5, 40, 230, 60 );
   bch1.setDatasource( data );
+  // sloupečkový, ne plošný graf; každý bod ze vstupu zabere 4 pixely na šířku a pak bude 1 px mezera
+  bch1.setResolution( 4, 1 );
   bch1.setColors( EG_BLACK, EG_BLUE, colors );
   // bch1.setSimpleColors( EG_BLACK, EG_BLUE, EG_RED );
   bch1.setOptions( SmallChart::CHART_MODE_BAR | SmallChart::CHART_BORDERS | SmallChart::CHART_COLORS_HBAR );
@@ -523,7 +525,7 @@ void demo7_smallChart_bar()
   painter->setFont( &malePismo );
   tft->setTextColor(EG_GREEN);
 
-  ChartDatasource * data = new ChartDatasource(250);
+  RingBufCDS * data = new RingBufCDS(250);
 
   ChColorProfile chc1( 0.0, EG_WHITE );
   ChColorProfile chc2( 1440.0, EG_YELLOW );
@@ -590,7 +592,7 @@ void demo8_smallChart_line()
   painter->setFont( &malePismo );
   tft->setTextColor(EG_GREEN);
 
-  ChartDatasource * data = new ChartDatasource(250);
+  RingBufCDS * data = new RingBufCDS(250);
 
   ChColorProfile chc1( 0.0, EG_WHITE );
   ChColorProfile chc2( 1440.0, EG_YELLOW );
@@ -662,7 +664,20 @@ void demo9_smallChart()
   painter->setFont( &malePismo );
   tft->setTextColor(EG_GREEN);
 
-  ChartDatasource * data = new ChartDatasource(250);
+  RingBufCDS * data = new RingBufCDS(250);
+  ArrayCDS * dataArray = new ArrayCDS(250);
+
+  /**
+   * Ukazuje použití ArrayCDS - pole, do kterého si položky mohu volně nastavit.
+   * Je možné i některé vynechat (zde pozice 100-129), v grafu nebudou vidět jako prázdné, ale ignorují se.
+   */
+  for( int i = 0; i<100; i++ ) {
+    dataArray->setItem( i, i+200 );
+  }
+  // tady preskocime generovani prvku 100-129
+  for( int i = 0; i<100; i++ ) {
+    dataArray->setItem( 130+i, 100-i +200 );
+  }
 
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 20, (char*)"SmallChart - vyplněný graf");  
 
@@ -675,14 +690,19 @@ void demo9_smallChart()
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 110, (char*)"SmallChart - čárový graf");  
   
   SmallChart bch2( tft );
-  bch2.setRange( 0, 3000 );
+  // Nenastavíme range ručně. Máme data již připravená, takže můžeme po nastavení dataSource provést autoRange()
+  // bch2.setRange( 0, 3000 );
   bch2.setPosition( 5, 130, 230, 60 );
-  bch2.setDatasource( data );
+  bch2.setDatasource( dataArray );
+  /** Provede nastavení rozsahu. Pozor! Jde o jednorázovou akci; pokud se data pak změní, rozsah zůstává stejný. */
+  bch2.autoRange();
   bch2.setOptions( SmallChart::CHART_MODE_LINE | SmallChart::CHART_BOTTOM_BORDER | SmallChart::CHART_LEFT_BORDER | SmallChart::CHART_LINE_2WIDTH  );
 
   painter->printLabel( TextPainter::ALIGN_CENTER, 120, 210, (char*)"(základní ukázka, bez barev)");  
 
-
+  /**
+   * Do Ring Bufferu naopak zapisujeme data po jedné, vždy se zapíší na začátek (a smažou poslední položku v poli, když už je plné)
+   */
   float f = 0;
   while( f<35 ) {
 

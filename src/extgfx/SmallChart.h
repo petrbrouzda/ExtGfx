@@ -11,29 +11,12 @@
  */
 
 
-#include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include "TextPainter.h"
 #include "BasicColors.h"
-
-/*
-Používáme upravenou verzi knihovny https://github.com/wizard97/ArduinoRingBuffer v lokálním podadresáři.
-*/
-#include "../RingBuf/RingBuf.h"
+#include "ChartDataSource.h"
 
 
-
-/**
- * Datový zdroj - ring buffer. Přes něj se vkládají data.
- */
-class ChartDatasource {
-    public:
-        ChartDatasource( int numItems );
-        void put( float item );
-        RingBuf * data;
-        int version;
-
-};
 
 /**
  * Barevný profil pro jeden rozsah hodnot.
@@ -64,18 +47,22 @@ class SmallChart {
     public:
         SmallChart( Adafruit_GFX *display );
 
-        /** Rozsah hodnot, které budou použity pro zobrazení od levé do pravé strany. Min musí být menší než max.*/
+        /** Rozsah hodnot, které budou použity pro zobrazení od spodní k horní ose. Min musí být menší než max.*/
         void setRange(float minVal, float maxVal);
         /** Pozice a velikost widgetu. */
         void setPosition( int x, int y, int w, int h );
         /** Rozlišení - kolik px na jeden datový bod  */
-        void setResolution( int pixelsPerDatapoint );
+        void setResolution( int pixelsPerDatapoint, int pixelsSpacing=0 );
         /** Nastavení barevného profilu */
         void setColors( uint16_t background, uint16_t border, ChColorProfile **colors );
         /** Zjednodušené zadání barev pro jednobarevný graf */
         void setSimpleColors( uint16_t background, uint16_t border, uint16_t chart );
         /** Nastavení options - hodnot z enumu SmallChartOptions */
         void setOptions( int options );
+        /** Provede nastavení rozsahu. 
+         * dataSource už musí být nastaveno a musí obsahovat data.
+         * Pozor! Jde o jednorázovou akci; pokud se data pak změní, rozsah zůstává stejný. */
+        void autoRange( bool setLowLimitToZero = false );
 
         /** Nastavení zdroje dat */
         void setDatasource( ChartDatasource * datasource );
@@ -85,6 +72,9 @@ class SmallChart {
 
         /** Vykresli. Pokud se data nezměnila, nekreslí se, pokud není force=true. */
         void draw( bool force = false );
+
+        /** vrátí informaci, zda se bude vykreslovat - tj. buď je dirty, nebo je aktualizovaný datasource */
+        bool willRedraw();
 
         /** Možné hodnoty pro options */
         enum SmallChartOptions { 
@@ -117,6 +107,9 @@ class SmallChart {
             CHART_COLORS_HBAR = 1024,
         };
 
+        float getMinVal();
+        float getMaxVal();
+
     private:
         Adafruit_GFX *display;
 
@@ -129,13 +122,15 @@ class SmallChart {
         ChartDatasource * dataSrc;
         int dataVer;
 
-        float minVal;
-        float maxVal;
         int x; 
         int y; 
         int h; 
         int w;
         int pixelsPerDatapoint;
+        int pixelsSpacing;
+
+        float minVal;
+        float maxVal;
 
         bool dirty;
 
