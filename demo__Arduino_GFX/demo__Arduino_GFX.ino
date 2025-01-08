@@ -1,11 +1,42 @@
-#include "Adafruit_ST7789.h" 
-#include "Adafruit_ST77xx.h"
-#include <SPI.h>
+/**
+ * Demo pro Arduino_GFX
+ * 
+ * Pro sedmipalcový displej https://s.click.aliexpress.com/e/_Dd1MOOf
+ * 
+ * Nutné je ESP32 core 2.0.x (ideálně 2.0.17) 
+ * a knihovna Arduino_GFX 1.5.0 (ne vyšší!)
+ * 
+ * Popis rozběhání displeje: https://pebrou.wordpress.com/2025/01/07/levny-7-displej-s-esp32-s3-poznamky/
+ * 
+ * FQBN: esp32:esp32:esp32s3:FlashSize=16M,PSRAM=opi
+ * 
+ * Detailní výpis použitých knihoven je na konci zdrojáku.
+ */
+
+#include <Arduino_GFX_Library.h>
+
+#define GFX_BL DF_GFX_BL // default backlight pin, you may replace DF_GFX_BL to actual backlight pin
+#define TFT_BL 2
+
+Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
+    41 /* DE */, 40 /* VSYNC */, 39 /* HSYNC */, 42 /* PCLK */,
+    14 /* R0 */, 21 /* R1 */, 47 /* R2 */, 48 /* R3 */, 45 /* R4 */,
+    9 /* G0 */, 46 /* G1 */, 3 /* G2 */, 8 /* G3 */, 16 /* G4 */, 1 /* G5 */,
+    15 /* B0 */, 7 /* B1 */, 6 /* B2 */, 5 /* B3 */, 4 /* B4 */,
+    0 /* hsync_polarity */, 180 /* hsync_front_porch */, 30 /* hsync_pulse_width */, 16 /* hsync_back_porch */,
+    0 /* vsync_polarity */, 12 /* vsync_front_porch */, 13 /* vsync_pulse_width */, 10 /* vsync_back_porch */,
+    1 /* pclk_active_neg */
+);
+
+Arduino_RGB_Display *tft = new Arduino_RGB_Display(
+    800 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */);
+
 
 #include "fonts/PragatiNarrow-Regular16pt8b.h"
 #include "fonts/PragatiNarrow-Regular20pt8b.h"
 #include "fonts/FrederickatheGreat-Regular40pt8b.h"
 
+// nasledujici radek nakonfiguruje knihovnu pro Arduino_GFX
 #include "src/extgfx/TextPainter.h"
 #include "src/extgfx/HorizontalBar.h"
 #include "src/extgfx/SmallChart.h"
@@ -13,19 +44,8 @@
 
 #include <math.h>
 
-// parametry pripojeni displeje
-#define TFT_CS   3
-#define TFT_RST  2
-#define TFT_DC   1
-#define TFT_MOSI 6
-#define TFT_SCLK 4
-#define SPI_MISO_UNUSED -1
-
 // LOW = vypnuto, HIGH = zapnuto
-#define TFT_BACKLIGHT 0
 #define TFT_BACKLIGHT_ON HIGH
-
-Adafruit_ST7789 *tft;
 
 TextPainter * painter;
 
@@ -36,26 +56,25 @@ TpFontConfig vetsiPismo;
 
 void setup() {
   Serial.begin(115200);
-  delay(3000); 
+  delay(2000); 
 
   Serial.println("");
   Serial.println( "ExtGfx demo start" );
+  Serial.printf( "Verze: %s\n", EXTGFX_VERSION );
 
   // ++++ zde si nastavte svuj displej
 
-    // nastavení pro 3.2" 240x320 displej s driverem ST7789 
-    // https://s.click.aliexpress.com/e/_Dd1MOOf
-    
-    SPI.end(); // release standard SPI pins
-    SPI.begin(TFT_SCLK, SPI_MISO_UNUSED, TFT_MOSI, TFT_CS); // map and init SPI pins
-    tft = new Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+    // nastavení pro 7.0" 800x480 CYD
+    // https://pebrou.wordpress.com/2025/01/07/levny-7-displej-s-esp32-s3-poznamky/
+    // (nicméně demo je pro 240x320)
 
-    pinMode( TFT_BACKLIGHT, OUTPUT );
-    digitalWrite( TFT_BACKLIGHT, TFT_BACKLIGHT_ON );
-    tft->init(240, 320);
-    tft->invertDisplay(false);
-    tft->setRotation(0);
-    tft->fillScreen(EG_BLACK);
+    tft->begin();
+    tft->fillScreen(BLACK);
+    
+    pinMode(TFT_BL, OUTPUT);
+    // zapnout podsvícení = cca 395 mA odběru (240/80 MHz); bez toho jen 85 mA
+    digitalWrite(TFT_BL, TFT_BACKLIGHT_ON );
+
     tft->setTextColor(EG_WHITE);
   // ----- nastaveni displeje
 
@@ -776,9 +795,7 @@ void loop() {
 
 
 /*
-Using library Adafruit ST7735 and ST7789 Library at version 1.10.0 in folder: C:\Users\brouzda\Documents\Arduino\libraries\Adafruit_ST7735_and_ST7789_Library 
-Using library Adafruit GFX Library at version 1.11.8 in folder: C:\Users\brouzda\Documents\Arduino\libraries\Adafruit_GFX_Library 
-Using library Adafruit BusIO at version 1.14.4 in folder: C:\Users\brouzda\Documents\Arduino\libraries\Adafruit_BusIO 
-Using library Wire at version 2.0.0 in folder: C:\Users\brouzda\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.11\libraries\Wire 
-Using library SPI at version 2.0.0 in folder: C:\Users\brouzda\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.11\libraries\SPI 
+Using library GFX Library for Arduino at version 1.5.0 in folder: C:\Users\brouzda\Documents\Arduino\libraries\GFX_Library_for_Arduino 
+Using library SPI at version 2.0.0 in folder: C:\Users\brouzda\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\libraries\SPI 
+Using library Wire at version 2.0.0 in folder: C:\Users\brouzda\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\libraries\Wire 
 */

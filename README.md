@@ -1,6 +1,6 @@
 # ExtGfx
 
-Sada grafických objektů ("widgetů") pro **ePaper a LCD/TFT/OLED displeje,** pro které je k dispozici knihovna implementující rozhraní **Adafruit_GFX.**
+Sada grafických objektů ("widgetů") pro **ePaper a LCD/TFT/OLED displeje,** pro které je k dispozici knihovna implementující rozhraní [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library) nebo [Arduino_GFX](https://github.com/moononournation/Arduino_GFX).
 
 Několik ukázek:
 
@@ -14,7 +14,7 @@ Knihovny jsou určené pro ESP32; asi budou fungovat i na ESP8266, ale nešetř�
 
 ## Práce s textem
 
-Objekt [TextPainter](src/extgfx/TextPainter.h) zajišťuje práci s textem.
+Objekt [TextPainter](ExtGfx/src/extgfx/TextPainter.h) zajišťuje práci s textem.
 
 Umí tisk textu s **UTF-8 češtinou** pomocí fontů připravených postupem popsaným zde: https://github.com/petrbrouzda/fontconvert8-iso8859-2 .
 
@@ -31,9 +31,7 @@ Detailní kontrola nad řádkováním.
 <img src="doc/d4.jpg" width="300">
 <img src="doc/d3.jpg" width="300">
 
-
-
-Demo a ukázky, jak se používá, najdete v [ExtGfx.ino](ExtGfx.ino) ve funkcích:
+Demo a ukázky, jak se používá, najdete v demonstračních aplikacích ve funkcích:
 * demo1_zakladniTextovyBlok()
 * demo2_labely()
 * demo3_zmenaRadkovani()
@@ -41,7 +39,7 @@ Demo a ukázky, jak se používá, najdete v [ExtGfx.ino](ExtGfx.ino) ve funkcí
 
 ## Horizontal bar gauge ("progress dialog")
 
-Je implementován v  [HorizontalBar](src/extgfx/HorizontalBar.h).
+Je implementován v  [HorizontalBar](ExtGfx/src/extgfx/HorizontalBar.h).
 
 Umí udělat indikátor různých velikostí. Implementuje "barevnou paletu", kde určíte, jaké mají být barvy pro jednotlivé rozsahy vstupních hodnot. Takže pro normální stav může být indikátor bílý, pro vysoké hodnoty červený atd.
 
@@ -52,13 +50,13 @@ Informační text se zobrazovanou hodnotou se ukazuje ve středu barevného pruh
 <img src="doc/d5-2.jpg" width="300">
 <img src="doc/d5-4.jpg" width="300">
 
-Demo a ukázky, jak se používá, najdete v [ExtGfx.ino](ExtGfx.ino) ve funkci demo5_horizontalBar().
+Demo a ukázky, jak se používá, najdete v demonstračních aplikacích ve funkci demo5_horizontalBar().
 
 ## Jednoduché grafy
 
-Najdete je v  [SmallChart](src/extgfx/SmallChart.h).
+Najdete je v  [SmallChart](ExtGfx/src/extgfx/SmallChart.h).
 
-Demo a ukázky, jak se používají, najdete v [ExtGfx.ino](ExtGfx.ino) ve funkcích:
+Demo a ukázky, jak se používají, najdete v demonstračních aplikacích ve funkcích:
 * demo9_smallChart()
 * demo6_smallChart1()
 * demo7_smallChart_bar()
@@ -83,16 +81,17 @@ Je možné určit, zda je celý graf v prostoru mezi okraji (pokud jsou vykresle
 
 ## Demonstrační aplikace
 
-Demo [ExtGfx.ino](ExtGfx.ino) je určeno pro ESP32-C3 a levný 3.2" 240x320 displej s driverem ST7789 (https://s.click.aliexpress.com/e/_Dd1MOOf).
+Aplikace [demo__Adafruit_GFX](demo__Adafruit_GFX/demo__Adafruit_GFX.ino ) je určeno pro ESP32-C3 a levný 3.2" 240x320 displej s driverem ST7789 (https://s.click.aliexpress.com/e/_Dd1MOOf).
 
 Po změně inicializace displeje by měla fungovat s čímkoli, co podporuje Adafruit_GFX. Pokud je váš displej menší než 240x320, pak samozřejmě bude potřeba upravit souřadnice a velikosti v jednotlivých ukázkách.
 
+Aplikace [demo__Arduino_GFX](demo__Arduino_GFX/demo__Arduino_GFX.ino) je určena pro 7" CYD display s procesorem ESP32-S3 (https://s.click.aliexpress.com/e/_Dn1RQ6d). Konfigurace potřebných knihoven je popsána zde: https://pebrou.wordpress.com/2025/01/07/levny-7-displej-s-esp32-s3-poznamky/ jako varianta 3. 
 
 ## Q & A
 
 ### Jak to zahrnu do své aplikace?
 
-Nakopírujte do své aplikace adresář **src**.
+Ve vaší aplikaci si udělejte adresář **src** a nakopírujte do něj obsah **ExtGfx/src**.
 A pak si do svého .ino souboru vložte includy objektů, které potřebujete:
 
 ```
@@ -137,6 +136,8 @@ Fonty z Google Fonts, zpracované postupem dle https://github.com/petrbrouzda/fo
 
 ## Závislosti na externích knihovnách
 
+### Adafruit GFX
+
 Očekává se, že v Arduino IDE máte odpovídající Adafruit GFX knihovnu pro váš displej. Konkrétní závislosti pro  displej použitý v demu vypadají takto:
 * "Adafruit ST7735 and ST7789 Library" 1.10.0
 * "Adafruit GFX Library" 1.11.8 
@@ -146,3 +147,10 @@ Očekává se, že v Arduino IDE máte odpovídající Adafruit GFX knihovnu pro
 
 Kompilace je otestována na ESP32 core pro Arduino **2.0.11**.
 
+### Arduino GFX
+
+V Arduino IDE musíte mít knihovnu „GFX library for Arduino“ by Moon On Our Nation ve verzi 1.5.0, **ne vyšší**.
+
+Kompilace je otestována na ESP32 core pro Arduino **2.0.17**.
+
+(Teoreticky by mohla fungovat verze 1.5.1 s ESP32 core 3.0.x.)
