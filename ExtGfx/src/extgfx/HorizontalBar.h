@@ -1,7 +1,8 @@
 #ifndef _HORIZONTALBAR___H_
 #define _HORIZONTALBAR___H_
 
-#include <Adafruit_GFX.h>
+#include "ExtGfx.h"
+
 #include "TextPainter.h"
 
 
@@ -101,7 +102,7 @@ else it is printer after bar:
  */
 class HorizontalBar {
     public:
-        HorizontalBar( Adafruit_GFX *display, TextPainter * painter );
+        HorizontalBar( EXTGFX_DISPLAY_TYPE *display, TextPainter * painter );
         /** Font pro text. */
         void setFont( TpFontConfig * font );
         /** Rozsah hodnot, které budou použity pro zobrazení od levé do pravé strany. Min musí být menší než max.*/
@@ -126,7 +127,7 @@ class HorizontalBar {
         bool willRedraw();
 
     private:
-        Adafruit_GFX *display;
+        EXTGFX_DISPLAY_TYPE *display;
         TextPainter * painter;
         HbColorProfile **colors;
         TpFontConfig * font;

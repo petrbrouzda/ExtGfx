@@ -19,8 +19,9 @@
  * - demo4_upravyRadkovaniFontu2()
  */
 
-#include <Arduino.h>
-#include <Adafruit_GFX.h>
+
+#include "ExtGfx.h"
+
 #include "../gfxlatin2/gfxlatin2.h"
 
 /** velikost pracovního bufferu, delší text bude oříznut na tuto délku */
@@ -78,12 +79,12 @@ class TextPainter {
          * hyphenation = rozdělování slov na konci řádku;
          * convertUtf8to8bit = podpora pro češtinu podle https://github.com/petrbrouzda/fontconvert8-iso8859-2
          */
-        TextPainter( Adafruit_GFX* display, bool hyphenation = true, bool convertUtf8to8bit = true );
+        TextPainter( EXTGFX_DISPLAY_TYPE* display, bool hyphenation = true, bool convertUtf8to8bit = true );
 
         /**
          * Změna cíle, kam se tiskne. Může se tisknout i do canvasu, ne jen na fyzický displej.
          */
-        void setDisplay( Adafruit_GFX* display );
+        void setDisplay( EXTGFX_DISPLAY_TYPE* display );
 
         /**
          * Vytvoří parametry fontu. Načte jeho velikost vyrenderováním základních písmen.
@@ -182,7 +183,7 @@ class TextPainter {
 
 
     private:
-        Adafruit_GFX* display;
+        EXTGFX_DISPLAY_TYPE* display;
 
         /** rozdělování slov na konci řádku */
         bool hyphenation;

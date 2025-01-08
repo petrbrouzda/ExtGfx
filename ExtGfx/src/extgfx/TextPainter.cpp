@@ -15,7 +15,7 @@ TpFontConfig::TpFontConfig(const GFXfont *font, int lineHeightOffset, int charWi
     }
 }
 
-TextPainter::TextPainter(Adafruit_GFX *display, bool hyphenation, bool convertUtf8to8bit)
+TextPainter::TextPainter(EXTGFX_DISPLAY_TYPE *display, bool hyphenation, bool convertUtf8to8bit)
 {
     this->display = display;
     this->hyphenation = hyphenation;
@@ -29,7 +29,7 @@ TextPainter::TextPainter(Adafruit_GFX *display, bool hyphenation, bool convertUt
     }
 }
 
-void TextPainter::setDisplay(Adafruit_GFX *display)
+void TextPainter::setDisplay(EXTGFX_DISPLAY_TYPE *display)
 {
     this->display = display;
 }

@@ -10,7 +10,7 @@ v lokálním podadresáři.
 
 /**
  * Datový zdroj pro grafy - interface.
- * Reálná implementace: RingBufDS
+ * Reálné implementace: RingBufCDS, ArrayCDS
  */
 class ChartDatasource {
     public:

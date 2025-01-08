@@ -6,7 +6,7 @@
 
 #define MAX_COLORS_PER_CHART 20
 
-SmallChart::SmallChart( Adafruit_GFX *display )
+SmallChart::SmallChart( EXTGFX_DISPLAY_TYPE *display )
 {
     this->display = display;
     this->pixelsPerDatapoint = 1;
@@ -105,7 +105,7 @@ void SmallChart::setDirty()
 int colorHbarSize[MAX_COLORS_PER_CHART];
 int colorHbarColor[MAX_COLORS_PER_CHART];
 
-void vykresliSvislouPruhovanouCaru( int x, int y, int negativeSize, Adafruit_GFX *display )
+void vykresliSvislouPruhovanouCaru( int x, int y, int negativeSize, EXTGFX_DISPLAY_TYPE *display )
 {
     int sz = -negativeSize;
 

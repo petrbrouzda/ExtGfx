@@ -11,7 +11,8 @@
  */
 
 
-#include <Adafruit_GFX.h>
+#include "ExtGfx.h"
+
 #include "TextPainter.h"
 #include "BasicColors.h"
 #include "ChartDataSource.h"
@@ -45,7 +46,7 @@ class ChColorProfile {
 class SmallChart {
 
     public:
-        SmallChart( Adafruit_GFX *display );
+        SmallChart( EXTGFX_DISPLAY_TYPE *display );
 
         /** Rozsah hodnot, které budou použity pro zobrazení od spodní k horní ose. Min musí být menší než max.*/
         void setRange(float minVal, float maxVal);
@@ -111,7 +112,7 @@ class SmallChart {
         float getMaxVal();
 
     private:
-        Adafruit_GFX *display;
+        EXTGFX_DISPLAY_TYPE *display;
 
         ChColorProfile **colors;
         uint16_t background;

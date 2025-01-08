@@ -18,7 +18,7 @@ HbColorProfile::HbColorProfile(float valueFrom, uint16_t colorBar, uint16_t colo
 }
 
 
-HorizontalBar::HorizontalBar( Adafruit_GFX *display, TextPainter * painter )
+HorizontalBar::HorizontalBar( EXTGFX_DISPLAY_TYPE *display, TextPainter * painter )
 {
     this->display = display;
     this->painter = painter;
