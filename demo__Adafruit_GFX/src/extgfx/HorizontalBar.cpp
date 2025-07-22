@@ -96,7 +96,7 @@ void HorizontalBar::draw(bool force)
     this->display->writeFastHLine( this->x,  this->y  ,this->w, color->colorBorder );
     this->display->writeFastHLine( this->x,  this->y+h,this->w, color->colorBorder );
     this->display->writeFastVLine( this->x,  this->y,  this->h, color->colorBorder );
-    this->display->writeFastVLine( this->x+this->w,this->y,  this->h, color->colorBorder );
+    this->display->writeFastVLine( this->x+this->w,this->y,  this->h+1, color->colorBorder );
     int size1 = (int)((double)(this->w) * value ) - 1;
     if( size1>0 ) {
         this->display->writeFillRect( this->x+1, this->y+1, size1, this->h-1, color->colorBar );
