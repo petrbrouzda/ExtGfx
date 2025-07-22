@@ -18,7 +18,7 @@ HbColorProfile::HbColorProfile(float valueFrom, uint16_t colorBar, uint16_t colo
 }
 
 
-HorizontalBar::HorizontalBar( Adafruit_GFX *display, TextPainter * painter )
+HorizontalBar::HorizontalBar( EXTGFX_DISPLAY_TYPE *display, TextPainter * painter )
 {
     this->display = display;
     this->painter = painter;
@@ -109,6 +109,12 @@ void HorizontalBar::draw(bool force)
     }
     this->display->endWrite();
 
+    if( this->currentText[0]==0 ) {
+        // prazdny text
+        this->dirty = false;
+        return;
+    }
+
     int16_t x1, y1;
     uint16_t textW, textH;
     this->painter->getTextBounds( (const char*)this->currentText, this->x, this->y, &x1, &y1, &textW, &textH );
@@ -116,9 +122,13 @@ void HorizontalBar::draw(bool force)
     int textX, textY;
     bool textOnBar = false;
 
-    if( textW < size1-20 ) {
+    if( textW < size1-20 || textW >= (this->w - size1 - 5) ) {
         // text doprostred baru
-        textX = this->x + size1/2 - textW/2;
+        if( textW+5 > size1 ) {
+            textX = this->x + 3;    
+        } else {
+            textX = this->x + size1/2 - textW/2;
+        }
         textOnBar = true;
     } else {
         // text hned za bar
