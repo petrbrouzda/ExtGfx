@@ -47,6 +47,15 @@ else it is printer after bar:
 
 /**
  * Barevný profil - sada barev pro jednotlivé zobrazované hodnoty. 
+    * <ul>
+    * <li> valueFrom - od jake hodnoty plati
+    * <li> colorBar - barva vyplne baru
+    * <li> colorBorder - barva okraje 
+    * <li> colorTextOnBar - barva textu, pokud je na vyplnenem baru
+    * <li> colorBgOnBar - barva pozadi pod textem na vyplnenem baru
+    * <li> colorTextOnBg - barva textu na prazdne casti
+    * <li> bgColor - barva prazdne casti
+    * </ul>
  * Předává se do HorizontalBar.setColors() jako pole pointerů na HbColorProfile.
  * Vysvětlení role jednotlivých barev v prvním komentáři v HorizontalBar.h
  * Demo/vysvětlení v ExtGfx.ino v demo5_horizontalBar()
