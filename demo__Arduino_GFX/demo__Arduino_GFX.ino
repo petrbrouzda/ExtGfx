@@ -69,7 +69,7 @@ void setup() {
     // (nicméně demo je pro 240x320)
 
     tft->begin();
-    tft->fillScreen(BLACK);
+    tft->fillScreen(0);
     
     pinMode(TFT_BL, OUTPUT);
     // zapnout podsvícení = cca 395 mA odběru (240/80 MHz); bez toho jen 85 mA
@@ -112,7 +112,7 @@ void demo1_zakladniTextovyBlok()
   int offset = painter->printText( (char*)"Text s češtinou, který by se měl zalamovat na konci řádku a je ve fialovém rámečku.");
   tft->setTextColor(EG_YELLOW);
   // použijeme offset vrácený z předešlého printText() jako druhý parametr a budeme pokračovat na stejné řádce dál
-  painter->printText( (char*)" A za něj přidáme žlutý text.", offset );
+  painter->printText( (char*)" A za něj přidáme žlutý text. Ďďíky!", offset );
   tft->setTextColor(EG_WHITE);
   // odřádkování
   painter->textLf();
