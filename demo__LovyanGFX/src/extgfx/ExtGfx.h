@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define EXTGFX_CORE_VERSION "2.2.1"
+#define EXTGFX_CORE_VERSION "2.1.2"
 
 /**
  * Zajistuje kompatibilitu mezi Adafruit_GFX, Lovyan GFX a Arduino_GFX displeji.

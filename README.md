@@ -1,6 +1,8 @@
 # ExtGfx
 
-Sada grafických objektů ("widgetů") pro **ePaper a LCD/TFT/OLED displeje,** pro které je k dispozici knihovna implementující rozhraní [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library) nebo [Arduino_GFX](https://github.com/moononournation/Arduino_GFX).
+Sada grafických objektů ("widgetů") pro **ePaper a LCD/TFT/OLED displeje,** pro které je k dispozici knihovna implementující 
+rozhraní [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library), [Arduino_GFX](https://github.com/moononournation/Arduino_GFX)
+nebo [LovyanGFX](https://github.com/lovyan03/LovyanGFX)
 
 Několik ukázek:
 
@@ -87,6 +89,9 @@ Po změně inicializace displeje by měla fungovat s čímkoli, co podporuje Ada
 
 Aplikace [demo__Arduino_GFX](demo__Arduino_GFX/demo__Arduino_GFX.ino) je určena pro 7" CYD display s procesorem ESP32-S3 (https://s.click.aliexpress.com/e/_Dn1RQ6d). Konfigurace potřebných knihoven je popsána zde: https://pebrou.wordpress.com/2025/01/07/levny-7-displej-s-esp32-s3-poznamky/ jako varianta 3. 
 
+Aplikace [demo__LovyanGFX](demo__LovyanGFX/demo__LovyanGFX.ino) je určena pro 7" CYD display s procesorem ESP32-S3 (https://s.click.aliexpress.com/e/_Dn1RQ6d) a knihovnu LovyanGFX, která mi pro něj přijde stabilnější. Vyžaduje ESP32 core verze 3.
+
+
 ## Q & A
 
 ### Jak to zahrnu do své aplikace?
@@ -149,8 +154,10 @@ Kompilace je otestována na ESP32 core pro Arduino **2.0.11**.
 
 ### Arduino GFX
 
-V Arduino IDE musíte mít knihovnu „GFX library for Arduino“ by Moon On Our Nation ve verzi 1.5.0, **ne vyšší**.
+V Arduino IDE musíte mít pro ESP32 core pro Arduino **2.0.x** knihovnu „GFX library for Arduino“ by Moon On Our Nation ve verzi 1.5.0, **ne vyšší**.
 
-Kompilace je otestována na ESP32 core pro Arduino **2.0.17**.
+Pokud používáte ESP32 core verze **3.x**, použijte „GFX library for Arduino“ by Moon On Our Nation v poslední verzi.
 
-(Teoreticky by mohla fungovat verze 1.5.1 s ESP32 core 3.0.x.)
+### LovyanGFX
+
+Otestováno s LovyanGFX by lovyan03 verze 1.2.28 na ESP32 core 3.3.8.

@@ -181,9 +181,6 @@ class TextPainter {
          */
         void noBackground();
 
-        int getY();
-        int getX();
-
 
     private:
         EXTGFX_DISPLAY_TYPE* display;

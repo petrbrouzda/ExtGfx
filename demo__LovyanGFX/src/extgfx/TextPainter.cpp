@@ -558,12 +558,3 @@ int TextPainter::printText( const char * text, int x_offset  ) {
     this->posY = y;
     return x - this->posX;
 }
-
-
-int TextPainter::getX() {
-  return this->posX;
-}
-
-int TextPainter::getY() {
-  return this->posY;
-}
